@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ReservationVol index{% endblock %}
+
+{% block body %}
+    <h1>ReservationVol index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Classe</th>
+                <th>Nb_billets</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation_vol in reservation_vols %}
+            <tr>
+                <td>{{ reservation_vol.id }}</td>
+                <td>{{ reservation_vol.classe }}</td>
+                <td>{{ reservation_vol.nbBillets }}</td>
+                <td>
+                    <a href="{{ path('app_reservation_vol_show', {'id': reservation_vol.id}) }}">show</a>
+                    <a href="{{ path('app_reservation_vol_edit', {'id': reservation_vol.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_reservation_vol_new') }}">Create new</a>
+{% endblock %}
