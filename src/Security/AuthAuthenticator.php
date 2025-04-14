@@ -57,8 +57,8 @@ class AuthAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
         }
 
-        // Default redirect for other users
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        // Redirect regular users to their dashboard
+        return new RedirectResponse($this->urlGenerator->generate('user_dashboard'));
     }
 
     protected function getLoginUrl(Request $request): string
