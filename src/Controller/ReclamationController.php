@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Reclamation;
+use App\Entity\User;
 use App\Form\ReclamationType;
 use App\Repository\ReclamationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,10 +31,14 @@ final class ReclamationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 🔥 Manually fetch the user with ID = 1 and assign it
+            $user = $entityManager->getRepository(User::class)->find(1);
+            $reclamation->setUser($user);
+
             $entityManager->persist($reclamation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_reclamation_index');
         }
 
         return $this->render('reclamation/new.html.twig', [
