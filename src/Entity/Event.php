@@ -99,15 +99,15 @@ class Event
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $prix = null;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 0, nullable: false)]
+    private ?string $prix = null;
 
-    public function getPrix(): ?float
+    public function getPrix(): ?string
     {
         return $this->prix;
     }
 
-    public function setPrix(float $prix): self
+    public function setPrix(string $prix): self
     {
         $this->prix = $prix;
         return $this;

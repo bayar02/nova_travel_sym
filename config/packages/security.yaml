@@ -17,13 +17,16 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            entry_point: 'App\Security\AuthAuthenticator'
+
+
             form_login:
                 login_path: login
                 check_path: login
             logout:
                 path: logout
                 target: /
-            custom_authenticator: App\Security\AuthAuthenticator
+            custom_authenticator: 'App\Security\AuthAuthenticator'
 
             remember_me:
                 secret: '%kernel.secret%'

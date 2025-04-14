@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin User Management{% endblock %}
+
+{% block body %}
+{# You might want to extend an admin base template instead of base.html.twig #}
+{# e.g., {% extends 'admin/base_admin.html.twig' %} #}
+
+<div class="admin-content-wrapper example-wrapper"> {# Use the same wrapper class as dashboard? #}
+    <h1>User Management</h1>
+
+    <p>List of users will appear here.</p>
+
+    {# Example table structure - Adapt as needed #}
+    {#
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                <td>
+                    {# Links to show/edit/delete actions #}
+                    {# <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a> #}
+                    {# <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a> #}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no users found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    #}
+
+    {# Link to create new user? #}
+    {# <a href="{{ path('app_user_new') }}">Create new user</a> #}
+</div>
+
+{# Include the sidebar again if not in a shared admin base template #}
+{# {% include 'partials/_admin_sidebar.html.twig' %} #}
+{# Or ensure your admin base template includes it #}
+
+{% endblock %} 
