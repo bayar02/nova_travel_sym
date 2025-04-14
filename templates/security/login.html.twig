@@ -1,37 +1,105 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Welcome to Bayar{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/styles/auth.css') }}">
+{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <div class="container" data-controller="auth">
+        <div class="form-box login">
+            <form method="post" action="{{ path('login') }}">
+                {# CSRF Token required by AuthAuthenticator #}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                
+                <h1>Login</h1>
+                
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                <div class="input-box">
+                    {# Use name="mail" as expected by AuthAuthenticator #}
+                    <input type="text" value="{{ last_username }}" name="mail" placeholder="Email" required autofocus autocomplete="username">
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    {# Use name="password" as expected by AuthAuthenticator #}
+                    <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+                    <i class='bx bxs-lock-alt' ></i>
+                </div>
+                {# Add Remember Me checkbox if needed #}
+                {# <div class="remember-me"><input type="checkbox" name="_remember_me" checked> Remember me</div> #}
+                
+                <div class="forgot-link">
+                    <a href="#">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>or login with social platforms</p>
+                <div class="social-icons">
+                    <a href="#"><i class='bx bxl-google' ></i></a>
+                    <a href="#"><i class='bx bxl-facebook' ></i></a>
+                    <a href="#"><i class='bx bxl-github' ></i></a>
+                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                </div>
+            </form>
         </div>
-    {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputMail">Mail</label>
-    <input type="text" value="{{ last_username }}" name="mail" id="inputMail" class="form-control" autocomplete="username" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+        <div class="form-box register">
+            {{ form_start(registrationForm, {'action': path('app_register'), 'method': 'POST'}) }}
+                <h1>Registration</h1>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.prenom, {'attr': {'placeholder': 'First Name'}}) }}
+                    <i class='bx bxs-user'></i>
+                    {{ form_errors(registrationForm.prenom) }}
+                </div>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.nom, {'attr': {'placeholder': 'Last Name'}}) }}
+                    <i class='bx bxs-user'></i>
+                    {{ form_errors(registrationForm.nom) }}
+                </div>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.cin, {'attr': {'placeholder': 'CIN'}}) }}
+                    <i class='bx bxs-id-card'></i>
+                    {{ form_errors(registrationForm.cin) }}
+                </div>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.tel, {'attr': {'placeholder': 'Telephone'}}) }}
+                    <i class='bx bxs-phone'></i>
+                    {{ form_errors(registrationForm.tel) }}
+                </div>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.mail, {'attr': {'placeholder': 'Email'}}) }}
+                    <i class='bx bxs-envelope' ></i>
+                    {{ form_errors(registrationForm.mail) }}
+                </div>
+                <div class="input-box">
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Password', 'autocomplete': 'new-password'}}) }}
+                    <i class='bx bxs-lock-alt' ></i>
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+                <button type="submit" class="btn">Register</button>
+            {{ form_end(registrationForm) }}
+        </div>
 
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Hello, Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button class="btn register-btn">Register</button>
+            </div>
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
+            <div class="toggle-panel toggle-right">
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button class="btn login-btn">Login</button>
+            </div>
+        </div>
     </div>
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %} 

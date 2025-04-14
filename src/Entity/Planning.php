@@ -56,16 +56,7 @@ class Planning
         return $this;
     }
 
-    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'plannings')]
-    #[ORM\JoinTable(
-        name: 'planning_events',
-        joinColumns: [
-            new ORM\JoinColumn(name: 'id_planning', referencedColumnName: 'id')
-        ],
-        inverseJoinColumns: [
-            new ORM\JoinColumn(name: 'id_event', referencedColumnName: 'id')
-        ]
-    )]
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'plannings')]
     private Collection $events;
 
     public function __construct()
