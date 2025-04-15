@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Flights{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        #admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            width: 250px;
+            transition: width 300ms ease-in-out;
+            background-color: #282a36;
+            overflow-x: hidden;
+        }
+        
+        #admin-sidebar.close {
+            width: 60px;
+        }
+        
+        #admin-sidebar ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        #admin-sidebar li {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #admin-sidebar a, 
+        #admin-sidebar button {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        #admin-sidebar a:hover, 
+        #admin-sidebar button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        #admin-sidebar li.active a {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-left: 4px solid #4e73df;
+        }
+        
+        #admin-sidebar span {
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        #admin-sidebar-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .admin-content-wrapper {
+            padding: 25px 25px 25px 85px;
+            margin: 0;
+            transition: padding-left 300ms ease-in-out;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-color: #f8f9fc;
+        }
+        
+        #admin-sidebar:not(.close) + .admin-content-wrapper {
+            padding-left: 275px;
+        }
+        
+        .flight-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .flight-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .flight-card h3 {
+            color: #4e73df;
+            margin-bottom: 15px;
+        }
+        
+        .booking-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        
+        .booking-info p {
+            margin-bottom: 8px;
+        }
+        
+        .booking-date {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 15px;
+        }
+        
+        .badge-class {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-economy {
+            background-color: #e9f5ff;
+            color: #0071c2;
+        }
+        
+        .badge-business {
+            background-color: #e6f3d4;
+            color: #5a913d;
+        }
+        
+        .badge-first {
+            background-color: #fff2e6;
+            color: #ff8c38;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block body %}
+{# Sidebar HTML - Adapted from admin/dashboard.html.twig #}
+{# Note: Using the same IDs/Classes as admin sidebar for CSS/JS compatibility #}
+<nav id="admin-sidebar"> {# Keep ID for CSS/JS #}
+    <ul>
+        <li>
+            {# Toggle Button #}
+            <button id="admin-sidebar-toggle-btn" title="Toggle Sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                    <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
+                </svg>
+            </button>
+        </li>
+        {# User Dashboard Home Link #}
+        <li class="{% if app.request.attributes.get('_route') == 'user_dashboard' %}active{% endif %}">
+            <a href="{{ path('user_dashboard') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                    <path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z"/>
+                </svg>
+                <span>Home</span>
+            </a>
+        </li>
+
+        {# My Flights Link #}
+        <li class="{% if app.request.attributes.get('_route') == 'app_user_flights' %}active{% endif %}">
+            <a href="{{ path('app_user_flights') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                    <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                </svg>
+                <span>My Flights</span>
+            </a>
+        </li>
+
+        {# Logout Button #}
+        <li class="logout-item">
+            <a href="{{ path('app_logout') }}" class="btn btn-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                <span>Log Out</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+{# User Dashboard Content #}
+<div class="admin-content-wrapper">
+    <div class="container-fluid">
+        <h1 class="mb-4">My Bookings</h1>
+        
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        {% if reservations is empty %}
+            <div class="alert alert-info">
+                You haven't booked any flights yet. <a href="{{ path('user_dashboard') }}">Browse available flights</a>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for reservation in reservations %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="flight-card">
+                            <h3>{{ reservation.vol.compagnie }} - {{ reservation.vol.destination }}</h3>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <p><strong>From:</strong> {{ reservation.vol.aeroportDepart }}</p>
+                                    <p><strong>Departure:</strong> {{ reservation.vol.dateDepart ? reservation.vol.dateDepart|date('d M Y H:i') : '' }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>To:</strong> {{ reservation.vol.aeroportArrivee }}</p>
+                                    <p><strong>Arrival:</strong> {{ reservation.vol.dateArrivee ? reservation.vol.dateArrivee|date('d M Y H:i') : '' }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="booking-info">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>Booking Details</strong>
+                                    {% set classBadge = 'badge-economy' %}
+                                    {% if reservation.classe == 'Business' %}
+                                        {% set classBadge = 'badge-business' %}
+                                    {% elseif reservation.classe == 'First Class' %}
+                                        {% set classBadge = 'badge-first' %}
+                                    {% endif %}
+                                    <span class="badge-class {{ classBadge }}">{{ reservation.classe }}</span>
+                                </div>
+                                <p><strong>Passengers:</strong> {{ reservation.nbBillets }}</p>
+                                <p><strong>Total Price:</strong> 
+                                    {% set multiplier = 1 %}
+                                    {% if reservation.classe == 'Business' %}
+                                        {% set multiplier = 1.5 %}
+                                    {% elseif reservation.classe == 'First Class' %}
+                                        {% set multiplier = 2 %}
+                                    {% endif %}
+                                    {{ (reservation.vol.prix * multiplier * reservation.nbBillets)|round(2) }} €
+                                </p>
+                                <p class="booking-date">Booking ID: #{{ reservation.id }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('admin-sidebar');
+        const toggleBtn = document.getElementById('admin-sidebar-toggle-btn');
+        
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('close');
+            });
+        }
+    });
+</script>
+{% endblock %} 

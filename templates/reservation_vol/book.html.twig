@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Book Flight{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        .booking-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        
+        .flight-details {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .booking-form {
+            padding-top: 20px;
+        }
+        
+        .price-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .total-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0071c2;
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-5">
+    <div class="booking-container">
+        <h1 class="mb-4">Book Your Flight</h1>
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        <div class="flight-details">
+            <h3>{{ vol.compagnie }} - {{ vol.destination }}</h3>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p><strong>From:</strong> {{ vol.aeroportDepart }}</p>
+                    <p><strong>Departure:</strong> {{ vol.dateDepart ? vol.dateDepart|date('d M Y H:i') : '' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>To:</strong> {{ vol.aeroportArrivee }}</p>
+                    <p><strong>Arrival:</strong> {{ vol.dateArrivee ? vol.dateArrivee|date('d M Y H:i') : '' }}</p>
+                </div>
+            </div>
+            <p><strong>Base Price:</strong> {{ vol.prix }} € per passenger</p>
+        </div>
+        
+        <div class="booking-form">
+            <form method="post">
+                <div class="mb-3">
+                    <label for="classe" class="form-label">Class</label>
+                    <select class="form-select" id="classe" name="classe" required onchange="updatePrice()">
+                        <option value="Economy" {% if reservation.classe == 'Economy' %}selected{% endif %}>Economy</option>
+                        <option value="Business" {% if reservation.classe == 'Business' %}selected{% endif %}>Business</option>
+                        <option value="First Class" {% if reservation.classe == 'First Class' %}selected{% endif %}>First Class</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="nb_billets" class="form-label">Number of Tickets</label>
+                    <select class="form-select" id="nb_billets" name="nb_billets" required onchange="updatePrice()">
+                        {% for i in 1..10 %}
+                            <option value="{{ i }}" {% if reservation.nbBillets == i %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="price-summary">
+                    <h4>Price Summary</h4>
+                    <div id="price-details">
+                        <p><span id="nb-tickets">1</span> × <span id="class-price">{{ vol.prix }}</span> € (<span id="class-name">Economy</span>)</p>
+                    </div>
+                    <div class="total-price">
+                        Total: <span id="total-price">{{ vol.prix }}</span> €
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePrice() {
+        const basePrice = {{ vol.prix }};
+        const nbTickets = parseInt(document.getElementById('nb_billets').value);
+        const classType = document.getElementById('classe').value;
+        
+        let multiplier = 1;
+        switch(classType) {
+            case 'Business':
+                multiplier = 1.5;
+                break;
+            case 'First Class':
+                multiplier = 2;
+                break;
+            default: // Economy
+                multiplier = 1;
+        }
+        
+        const classPrice = Math.round(basePrice * multiplier * 100) / 100;
+        const totalPrice = Math.round(classPrice * nbTickets * 100) / 100;
+        
+        document.getElementById('nb-tickets').textContent = nbTickets;
+        document.getElementById('class-name').textContent = classType;
+        document.getElementById('class-price').textContent = classPrice;
+        document.getElementById('total-price').textContent = totalPrice;
+    }
+    
+    // Initialize price calculation
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePrice();
+    });
+</script>
+{% endblock %} 
