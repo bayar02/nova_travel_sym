@@ -2,8 +2,265 @@
 
 {% block title %}User Dashboard{% endblock %}
 
-{# Stylesheets and Javascripts should be inherited from base.html.twig #}
-{# Ensure base.html.twig includes app.css and app.js which import sidebar assets #}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        #admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            width: 250px;
+            transition: width 300ms ease-in-out;
+            background-color: #282a36;
+            overflow-x: hidden;
+        }
+        
+        #admin-sidebar.close {
+            width: 60px;
+        }
+        
+        #admin-sidebar ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        #admin-sidebar li {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #admin-sidebar a, 
+        #admin-sidebar button {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        #admin-sidebar a:hover, 
+        #admin-sidebar button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        #admin-sidebar li.active a {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-left: 4px solid #4e73df;
+        }
+        
+        #admin-sidebar span {
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        #admin-sidebar-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .admin-content-wrapper {
+            padding: 25px 25px 25px 85px;
+            margin: 0;
+            transition: padding-left 300ms ease-in-out;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-color: #f8f9fc;
+        }
+        
+        #admin-sidebar:not(.close) + .admin-content-wrapper {
+            padding-left: 275px;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0;
+        }
+        
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+
+        .swiper {
+            width: 100%;
+            padding: 30px 0;
+        }
+
+        .swiper-slide {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 300px;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flight-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flight-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #4e73df;
+        }
+
+        .flight-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .flight-details {
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        /* Search box styles */
+        .search-box {
+            background-color: #003b95;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-box h3 {
+            color: white;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .search-box .form-control {
+            border-radius: 4px;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        .search-box .btn-primary {
+            background-color: #0071c2;
+            border-color: #0071c2;
+            height: 50px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .search-box .btn-primary:hover {
+            background-color: #005999;
+        }
+
+        .filter-bar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .search-results-title {
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
 
 {% block body %}
 {# Sidebar HTML - Adapted from admin/dashboard.html.twig #}
@@ -27,40 +284,240 @@
                 <span>Home</span>
             </a>
         </li>
-        {# User Management Link Removed #}
 
         {# Logout Button #}
         <li class="logout-item">
-            <button class="logoutButton logoutButton--dark" type="button" title="Log Out">
-                <svg class="doorway" viewBox="0 0 100 100">
-                    <path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z"></path>
-                    <path class="bang" d="M40.5 43.7L26.6 31.4l-2.5 6.7zM41.9 50.4l-19.5-4-1.4 6.3zM40 57.4l-17.7 3.9 3.9 5.7z"></path>
+            <a href="{{ path('app_logout') }}" class="btn btn-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
                 </svg>
-                <svg class="figure" viewBox="0 0 100 100">
-                    <circle cx="52.1" cy="32.4" r="6.4"></circle>
-                    <path d="M50.7 62.8c-1.2 2.5-3.6 5-7.2 4-3.2-.9-4.9-3.5-4-7.8.7-3.4 3.1-13.8 4.1-15.8 1.7-3.4 1.6-4.6 7-3.7 4.3.7 4.6 2.5 4.3 5.4-.4 3.7-2.8 15.1-4.2 17.9z"></path>
-                    <g class="arm1"><path d="M55.5 56.5l-6-9.5c-1-1.5-.6-3.5.9-4.4 1.5-1 3.7-1.1 4.6.4l6.1 10c1 1.5.3 3.5-1.1 4.4-1.5.9-3.5.5-4.5-.9z"></path><path class="wrist1" d="M69.4 59.9L58.1 58c-1.7-.3-2.9-1.9-2.6-3.7.3-1.7 1.9-2.9 3.7-2.6l11.4 1.9c1.7.3 2.9 1.9 2.6 3.7-.4 1.7-2 2.9-3.8 2.6z"></path></g>
-                    <g class="arm2"><path d="M34.2 43.6L45 40.3c1.7-.6 3.5.3 4 2 .6 1.7-.3 4-2 4.5l-10.8 2.8c-1.7.6-3.5-.3-4-2-.6-1.6.3-3.4 2-4z"></path><path class="wrist2" d="M27.1 56.2L32 45.7c.7-1.6 2.6-2.3 4.2-1.6 1.6.7 2.3 2.6 1.6 4.2L33 58.8c-.7 1.6-2.6 2.3-4.2 1.6-1.7-.7-2.4-2.6-1.7-4.2z"></path></g>
-                    <g class="leg1"><path d="M52.1 73.2s-7-5.7-7.9-6.5c-.9-.9-1.2-3.5-.1-4.9 1.1-1.4 3.8-1.9 5.2-.9l7.9 7c1.4 1.1 1.7 3.5.7 4.9-1.1 1.4-4.4 1.5-5.8.4z"></path><path class="calf1" d="M52.6 84.4l-1-12.8c-.1-1.9 1.5-3.6 3.5-3.7 2-.1 3.7 1.4 3.8 3.4l1 12.8c.1 1.9-1.5 3.6-3.5 3.7-2 0-3.7-1.5-3.8-3.4z"></path></g>
-                    <g class="leg2"><path d="M37.8 72.7s1.3-10.2 1.6-11.4 2.4-2.8 4.1-2.6c1.7.2 3.6 2.3 3.4 4l-1.8 11.1c-.2 1.7-1.7 3.3-3.4 3.1-1.8-.2-4.1-2.4-3.9-4.2z"></path><path class="calf2" d="M29.5 82.3l9.6-10.9c1.3-1.4 3.6-1.5 5.1-.1 1.5 1.4.4 4.9-.9 6.3l-8.5 9.6c-1.3 1.4-3.6 1.5-5.1.1-1.4-1.3-1.5-3.5-.2-5z"></path></g>
-                </svg>
-                <svg class="door" viewBox="0 0 100 100">
-                    <path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z"></path>
-                    <circle cx="66" cy="50" r="3.7"></circle>
-                </svg>
-                <span class="button-text">Log Out</span>
-            </button>
+                <span>Log Out</span>
+            </a>
         </li>
     </ul>
 </nav>
 
 {# User Dashboard Content #}
-<div class="admin-content-wrapper example-wrapper"> {# Reuse wrapper class? #}
-    <h1>Welcome to your Dashboard, {{ app.user.userIdentifier }}!</h1>
-
-    <p>This is the user dashboard area.</p>
-    {# Add user-specific content here #}
-
+<div class="admin-content-wrapper">
+    <div class="container-fluid">
+        <h1 class="mb-4">Welcome to your Dashboard, {{ app.user.userIdentifier }}!</h1>
+        
+        <!-- Search Box -->
+        <div class="search-box">
+            <h3>Search for Flights</h3>
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="destination" class="form-label">Where to?</label>
+                        <input type="text" class="form-control" id="destination" name="destination" placeholder="Destination" value="{{ searchCriteria.destination }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateStart" class="form-label">Start Date</label>
+                        <input type="date" class="form-control date-picker" id="dateStart" name="dateStart" placeholder="Check-in" value="{{ searchCriteria.dateStart }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateEnd" class="form-label">End Date</label>
+                        <input type="date" class="form-control date-picker" id="dateEnd" name="dateEnd" placeholder="Check-out" value="{{ searchCriteria.dateEnd }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        {% if searchPerformed %}
+            <!-- Filter Bar -->
+            <div class="filter-bar d-flex justify-content-between align-items-center">
+                <div class="search-results-title">
+                    {% if upcomingFlights|length > 0 %}
+                        {{ upcomingFlights|length }} flights found
+                    {% else %}
+                        No flights found
+                    {% endif %}
+                </div>
+                <div class="filters">
+                    <form method="post" id="sortForm" class="d-flex align-items-center">
+                        <input type="hidden" name="destination" value="{{ searchCriteria.destination }}">
+                        <input type="hidden" name="dateStart" value="{{ searchCriteria.dateStart }}">
+                        <input type="hidden" name="dateEnd" value="{{ searchCriteria.dateEnd }}">
+                        <label for="sortBy" class="me-2">Sort by:</label>
+                        <select class="form-select" id="sortBy" name="sortBy" onchange="document.getElementById('sortForm').submit()">
+                            <option value="date" {% if sortBy == 'date' %}selected{% endif %}>Date</option>
+                            <option value="price_asc" {% if sortBy == 'price_asc' %}selected{% endif %}>Price (Low to High)</option>
+                            <option value="price_desc" {% if sortBy == 'price_desc' %}selected{% endif %}>Price (High to Low)</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Upcoming Flights Carousel Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    {% if searchPerformed %}
+                        Search Results
+                    {% else %}
+                        Upcoming Flights
+                    {% endif %}
+                </h2>
+                
+                {% if upcomingFlights is empty %}
+                    <div class="alert alert-info">No flights found. Try different search criteria.</div>
+                {% else %}
+                    <div class="swiper flightsSwiper">
+                        <div class="swiper-wrapper">
+                            {% for flight in upcomingFlights %}
+                                <div class="swiper-slide">
+                                    <div class="flight-card">
+                                        <h3>{{ flight.compagnie }} - {{ flight.destination }}</h3>
+                                        <div class="flight-info">
+                                            <div class="flight-details">
+                                                <p><strong>From:</strong> {{ flight.aeroportDepart }}</p>
+                                                <p><strong>To:</strong> {{ flight.aeroportArrivee }}</p>
+                                                <p><strong>Departure:</strong> {{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}</p>
+                                                <p><strong>Arrival:</strong> {{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}</p>
+                                                <p><strong>Price:</strong> {{ flight.prix }} €</p>
+                                            </div>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-sm btn-info" onclick="showFlightDetails({{ flight.id }}, '{{ flight.compagnie }}', '{{ flight.destination }}', '{{ flight.aeroportDepart }}', '{{ flight.aeroportArrivee }}', '{{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}', '{{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}', {{ flight.prix }})">
+                                                    Details
+                                                </button>
+                                                <a href="#" class="btn btn-sm btn-primary">Book Flight</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Flight Details Modal -->
+<div id="flightDetailsModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Flight Details</h3>
+            <button class="modal-close" id="closeFlightModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 id="flightTitle"></h4>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>From:</strong> <span id="flightFrom"></span></p>
+                    <p><strong>Departure Date:</strong> <span id="flightDeparture"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>To:</strong> <span id="flightTo"></span></p>
+                    <p><strong>Arrival Date:</strong> <span id="flightArrival"></span></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Price:</strong> <span id="flightPrice"></span> €</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="#" class="btn btn-primary">Book this Flight</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Swiper
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the flights carousel
+        const swiper = new Swiper('.flightsSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                768: {
+                    slidesPerView: 3,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+            },
+        });
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('admin-sidebar');
+        const toggleBtn = document.getElementById('admin-sidebar-toggle-btn');
+        
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('close');
+            });
+        }
+
+        // Modal functionality
+        const flightModal = document.getElementById('flightDetailsModal');
+        const closeFlightModal = document.getElementById('closeFlightModal');
+
+        if (closeFlightModal && flightModal) {
+            closeFlightModal.addEventListener('click', function() {
+                flightModal.classList.remove('active');
+            });
+
+            flightModal.addEventListener('click', function(e) {
+                if (e.target === flightModal) {
+                    flightModal.classList.remove('active');
+                }
+            });
+        }
+        
+        // Initialize date pickers
+        flatpickr(".date-picker", {
+            dateFormat: "Y-m-d",
+            minDate: "today"
+        });
+    });
+
+    // Function to show flight details
+    function showFlightDetails(id, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix) {
+        const modal = document.getElementById('flightDetailsModal');
+        
+        // Fill in the flight details
+        document.getElementById('flightTitle').textContent = `${compagnie} - ${destination}`;
+        document.getElementById('flightFrom').textContent = aeroportDepart;
+        document.getElementById('flightTo').textContent = aeroportArrivee;
+        document.getElementById('flightDeparture').textContent = dateDepart;
+        document.getElementById('flightArrival').textContent = dateArrivee;
+        document.getElementById('flightPrice').textContent = prix;
+        
+        // Show the modal
+        if (modal) {
+            modal.classList.add('active');
+        }
+    }
+</script>
 
 {% endblock %} 

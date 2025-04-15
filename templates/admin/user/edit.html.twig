@@ -1,0 +1,117 @@
+{% extends 'admin/base_admin.html.twig' %} {# Use admin base template #}
+
+{% block admin_title %}Edit User {{ user.mail }}{% endblock %}
+
+{% block admin_stylesheets %}
+    {{ parent() }}
+    {# Reuse styles from new.html.twig or include shared admin form styles #}
+    <style>
+       /* Copy relevant styles from new.html.twig or define shared styles */
+       .admin-form-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #2a2a3d; /* Dark bg */
+            color: #e0e0e6; /* Light text */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .admin-form-container h1 {
+             margin-bottom: 25px;
+             color: #7a7dfa; /* Accent */
+        }
+        .admin-form-container .form-group {
+            margin-bottom: 15px;
+        }
+         /* Styles for ChoiceType checkboxes */
+        .admin-form-container .form-group div[id$="_roles"] label {
+             margin-right: 15px;
+             font-weight: normal;
+        }
+        .admin-form-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .admin-form-container input[type="text"],
+        .admin-form-container input[type="email"],
+        .admin-form-container input[type="tel"] {
+            width: 100%;
+            padding: 10px 15px;
+            background: #1e1e2d; /* Darker input bg */
+            border: 1px solid #36364a;
+            border-radius: 5px;
+            color: #e0e0e6;
+            font-size: 1rem;
+        }
+        .admin-form-container .btn {
+             padding: 10px 25px;
+             background-color: #7a7dfa; /* Accent */
+             color: #e0e0e6;
+             border-radius: 5px;
+             text-decoration: none;
+             font-weight: 500;
+             border: none;
+             cursor: pointer;
+             transition: background-color 0.2s ease;
+             margin-right: 10px; /* Space between buttons */
+        }
+        .admin-form-container .btn:hover {
+            background-color: #5e63ff; /* Slightly darker accent */
+        }
+         .admin-form-container .btn-back {
+            background-color: #42434a; /* Grey */
+        }
+        .admin-form-container .btn-back:hover {
+            background-color: #5a5b6a; /* Lighter grey */
+        }
+        .form-errors ul {
+            list-style: none;
+            padding: 5px 0 0 0;
+            margin: 0;
+            color: #ff6b6b; /* Red for errors */
+        }
+        .form-errors li {
+             font-size: 0.9em;
+        }
+        .delete-form-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #36364a;
+        }
+        .delete-form-container form button {
+             background-color: #ff4d4d; /* Red delete */
+             color: #fff;
+             /* Inherit .btn styles */
+             padding: 10px 25px; border-radius: 5px; text-decoration: none; font-weight: 500;
+             border: none; cursor: pointer; transition: background-color 0.2s ease; margin-right: 10px;
+         }
+         .delete-form-container form button:hover { background-color: #e60000; /* Darker red delete */ }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-content-wrapper">
+    <div class="admin-form-container">
+        <h1>Edit User: {{ user.mail }}</h1>
+
+        {# Use the editForm variable passed from the controller #}
+        {{ form_start(editForm) }}
+            <div class="form-group">{{ form_row(editForm.prenom) }}</div>
+            <div class="form-group">{{ form_row(editForm.nom) }}</div>
+            <div class="form-group">{{ form_row(editForm.cin) }}</div>
+            <div class="form-group">{{ form_row(editForm.tel) }}</div>
+            <div class="form-group">{{ form_row(editForm.mail) }}</div>
+            <div class="form-group">{{ form_row(editForm.roles) }}</div> {# Render roles checkboxes #}
+
+            <button type="submit" class="btn">Update User</button>
+            <a href="{{ path('admin_user_index') }}" class="btn btn-back">Back to List</a>
+        {{ form_end(editForm) }}
+
+        {# Include Delete Form #}
+        <div class="delete-form-container">
+             {{ include('admin/user/_delete_form.html.twig', {'user_id': user.id }) }} {# Pass user_id #}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -3,13 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\ReservationVol;
+use App\Entity\Vol;
 use App\Form\ReservationVolType;
 use App\Repository\ReservationVolRepository;
+use App\Repository\VolRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/reservation/vol')]
 final class ReservationVolController extends AbstractController
@@ -77,5 +80,56 @@ final class ReservationVolController extends AbstractController
         }
 
         return $this->redirectToRoute('app_reservation_vol_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/user/flights', name: 'app_user_flights', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function userFlights(ReservationVolRepository $reservationVolRepository): Response
+    {
+        $user = $this->getUser();
+        $reservations = $reservationVolRepository->findByUserWithFlightDetails($user);
+
+        return $this->render('reservation_vol/user_flights.html.twig', [
+            'reservations' => $reservations,
+        ]);
+    }
+
+    #[Route('/book/{id}', name: 'app_reservation_vol_book', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function bookFlight(Request $request, Vol $vol, EntityManagerInterface $entityManager): Response
+    {
+        // Create a new reservation
+        $reservation = new ReservationVol();
+        $reservation->setVol($vol);
+        $reservation->setUser($this->getUser());
+        
+        // Default values
+        $reservation->setClasse('Economy');
+        $reservation->setNbBillets(1);
+        
+        // Handle form submission
+        if ($request->isMethod('POST')) {
+            $classe = $request->request->get('classe');
+            $nbBillets = (int)$request->request->get('nb_billets');
+            
+            // Basic validation
+            if ($classe && in_array($classe, ['Economy', 'Business', 'First Class']) && $nbBillets > 0 && $nbBillets <= 10) {
+                $reservation->setClasse($classe);
+                $reservation->setNbBillets($nbBillets);
+                
+                $entityManager->persist($reservation);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Your flight has been booked successfully!');
+                return $this->redirectToRoute('app_user_flights');
+            }
+            
+            $this->addFlash('error', 'Please check your booking details.');
+        }
+        
+        return $this->render('reservation_vol/book.html.twig', [
+            'vol' => $vol,
+            'reservation' => $reservation,
+        ]);
     }
 }

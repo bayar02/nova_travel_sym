@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Vol;
+use App\Repository\VolRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,16 +30,37 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/users', name: 'admin_user_index')]
-    public function userIndex(): Response
-    {
-        // TODO: Implement user listing logic (fetch users from DB, etc.)
-        $users = []; // Placeholder
+    // --- FLIGHT (VOL) MANAGEMENT --- 
 
-        return $this->render('admin/user/index.html.twig', [
-            'users' => $users,
+    #[Route('/flights', name: 'admin_flight_index', methods: ['GET'])]
+    public function flightIndex(VolRepository $volRepository): Response
+    {
+        return $this->render('admin/flight/index.html.twig', [
+            'vols' => $volRepository->findAll(),
         ]);
     }
+
+    // Note: Add/Edit/Delete actions will likely reuse the existing VolController
+    // or require creating new actions here specifically for the admin interface.
+    // For simplicity, we'll link to the existing Vol CRUD routes for now.
+    // You might want dedicated admin routes/templates later.
+
+    // --- Remove User Management --- 
+    /*
+    #[Route('/users', name: 'admin_user_index')]
+    public function userIndex(UserRepository $userRepository): Response // Assuming UserRepository exists
+    {
+        return $this->render('admin/user/index.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/users/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
+    public function updateUserRole(Request $request, User $user, EntityManagerInterface $entityManager): JsonResponse
+    { 
+        // ... (Keep or remove based on if you still need user role editing elsewhere)
+    }
+    */
 
     // Add other admin-specific actions here...
 }

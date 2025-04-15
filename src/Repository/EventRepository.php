@@ -16,6 +16,21 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    /**
+     * Find upcoming events
+     * 
+     * @param int $limit The maximum number of results to retrieve
+     * @return Event[] Returns an array of upcoming Event objects
+     */
+    public function findUpcoming(int $limit = 10): array
+    {
+        return $this->createQueryBuilder('e')
+            ->orderBy('e.date_event', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Event[] Returns an array of Event objects
     //     */

@@ -1,4 +1,5 @@
 @import url('./admin_sidebar.css');
+@import url('./auth.css');
 
 body {
     background-color: skyblue;

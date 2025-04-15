@@ -1,4 +1,12 @@
+# Remove the LoginSuccessHandler service definition if it exists at the top
+# services:
+#     App\Security\LoginSuccessHandler:
+#         arguments:
+#             $urlGenerator: '@router'
+#             $security: '@security.helper' # Use security.helper service
+
 security:
+    enable_authenticator_manager: true # Ensure this is true (usually default)
     password_hashers:
         App\Entity\User:
             algorithm: auto
@@ -17,16 +25,18 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            entry_point: 'App\Security\AuthAuthenticator'
-
-
-            form_login:
-                login_path: login
-                check_path: login
+            # Remove form_login section as AuthAuthenticator handles it
+            # form_login:
+            #     login_path: app_login
+            #     check_path: app_login 
+            #     # success_handler: App\Security\LoginSuccessHandler # Removed
+            
             logout:
-                path: logout
-                target: /
-            custom_authenticator: 'App\Security\AuthAuthenticator'
+                path: app_logout
+                target: app_login # Redirect back to login on logout
+            
+            # Explicitly use the custom authenticator
+            custom_authenticator: App\Security\AuthAuthenticator
 
             remember_me:
                 secret: '%kernel.secret%'

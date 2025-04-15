@@ -39,10 +39,10 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/logout', name: 'logout', methods: ['GET'])]
+    #[Route('/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): void
     {
-        // controller can be blank: it will never be called!
-        throw new \Exception('Don\'t forget to activate logout in security.yaml');
+        // This method can be empty - it will be intercepted by the logout key on the firewall
+        // The logic is handled by Symfony's security system
     }
 } 
