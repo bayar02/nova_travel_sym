@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Vol;
-use App\Repository\VolRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -115,19 +115,15 @@ class AdminController extends AbstractController
     // --- Remove User Management --- 
     /*
     #[Route('/users', name: 'admin_user_index')]
-    public function userIndex(UserRepository $userRepository): Response // Assuming UserRepository exists
+    public function userIndex(): Response
     {
+        // TODO: Implement user listing logic (fetch users from DB, etc.)
+        $users = []; // Placeholder
+
         return $this->render('admin/user/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
     }
-
-    #[Route('/users/{id}/update-role', name: 'admin_user_update_role', methods: ['POST'])]
-    public function updateUserRole(Request $request, User $user, EntityManagerInterface $entityManager): JsonResponse
-    { 
-        // ... (Keep or remove based on if you still need user role editing elsewhere)
-    }
-    */
 
     // Add other admin-specific actions here...
 
