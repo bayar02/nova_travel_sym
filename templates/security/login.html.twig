@@ -3,8 +3,9 @@
 {% block title %}Welcome to Bayar{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('assets/styles/auth.css') }}">
+    {# {{ parent() }} #} {# No need for parent usually if overriding #}
+    {# Removed direct link - auth.css is imported via app.js/app.css #}
+    {# <link rel="stylesheet" href="{{ asset('assets/styles/auth.css') }}"> #}
 {% endblock %}
 
 {% block body %}

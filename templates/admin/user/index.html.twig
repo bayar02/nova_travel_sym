@@ -1,54 +1,236 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Admin User Management{% endblock %}
+{% block admin_title %}Admin User Management{% endblock %}
 
-{% block body %}
-{# You might want to extend an admin base template instead of base.html.twig #}
-{# e.g., {% extends 'admin/base_admin.html.twig' %} #}
+{% block admin_stylesheets %}
+    {{ parent() }}
+    <style>
+        .admin-user-table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for rounded corners on cells */
+            border-spacing: 0; /* Remove default spacing */
+            margin-top: 20px;
+            background-color: #2a2a3d;
+            color: #e0e0e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+        }
+        .admin-user-table th, .admin-user-table td {
+            padding: 15px 20px; /* Increased padding */
+            text-align: left;
+            border-bottom: 1px solid #36364a;
+            vertical-align: middle; /* Align content vertically */
+        }
+        .admin-user-table th {
+            background-color: #1e1e2d;
+            font-weight: 600;
+            color: #7a7dfa; /* Accent color for headers */
+        }
+        .admin-user-table tr:last-child td {
+             border-bottom: none;
+        }
+        .admin-user-table tbody tr:hover {
+            background-color: #36364a;
+        }
+        /* Actions column styling */
+        .admin-user-table .actions {
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        .admin-user-table .actions a, 
+        .admin-user-table .actions .btn-delete,
+        .admin-user-table .btn-save-role {
+            color: #e0e0e6; /* Light text */
+            text-decoration: none;
+            margin-right: 8px;
+            padding: 6px 12px; /* Slightly larger buttons */
+            border-radius: 5px;
+            transition: all 0.2s ease;
+            background-color: #42434a; /* Grey background */
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: inherit;
+            display: inline-block;
+        }
+        .admin-user-table .actions a:hover, 
+        .admin-user-table .actions .btn-delete:hover,
+        .admin-user-table .btn-save-role:hover {
+            background-color: #5e63ff; /* Accent hover */
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(94, 99, 255, 0.3);
+        }
+        .admin-user-table .actions .btn-delete {
+             background-color: #ff4d4d; /* Red delete */
+             color: #fff;
+        }
+         .admin-user-table .actions .btn-delete:hover {
+              background-color: #e60000; /* Darker red */
+         }
+         .admin-user-table .actions form {
+             display: inline; 
+         }
+         /* Role Select Box */
+         .role-select {
+             padding: 6px 10px;
+             background-color: #1e1e2d;
+             color: #e0e0e6;
+             border: 1px solid #36364a;
+             border-radius: 5px;
+             font-family: inherit;
+             margin-right: 5px;
+             min-width: 100px; /* Give it some width */
+         }
+         .btn-save-role {
+             background-color: #28a745; /* Green save */
+             color: #fff;
+             padding: 6px 10px; /* Match select box height */
+             font-size: 0.85em;
+         }
+          .btn-save-role:hover {
+             background-color: #218838; /* Darker green */
+          }
 
-<div class="admin-content-wrapper example-wrapper"> {# Use the same wrapper class as dashboard? #}
+        /* Create button */
+        .btn-create-user {
+             display: inline-block;
+             padding: 12px 25px;
+             background: linear-gradient(45deg, #7a7dfa, #5e63ff);
+             color: #fff;
+             border-radius: 5px;
+             text-decoration: none;
+             font-weight: 600;
+             margin-bottom: 25px;
+             transition: all 0.3s ease;
+             box-shadow: 0 4px 10px rgba(94, 99, 255, 0.3);
+        }
+        .btn-create-user:hover {
+            background: linear-gradient(45deg, #5e63ff, #7a7dfa);
+            box-shadow: 0 6px 15px rgba(94, 99, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        /* Role specific styles */
+        .role-cell {
+            display: flex;
+            align-items: center;
+        }
+        .role-cell .save-status {
+            margin-left: 10px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+         .role-cell .save-status.visible {
+             opacity: 1;
+         }
+          .save-success { color: #28a745; } /* Green */
+          .save-error { color: #dc3545; } /* Red */
+    </style>
+{% endblock %}
+
+{% block admin_content %}
     <h1>User Management</h1>
 
-    <p>List of users will appear here.</p>
+    <a href="{{ path('admin_user_new') }}" class="btn btn-create-user">Create New User</a>
 
-    {# Example table structure - Adapt as needed #}
-    {#
-    <table>
+    <table class="admin-user-table">
         <thead>
             <tr>
-                <th>ID</th>
+                {# ID column removed #}
                 <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                <td>
-                    {# Links to show/edit/delete actions #}
-                    {# <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a> #}
-                    {# <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a> #}
+            <tr data-user-id="{{ user.id }}"> {# Add user ID for JS targeting #}
+                <td>{{ user.mail }}</td>
+                <td>{{ user.prenom | default('N/A') }}</td>
+                <td>{{ user.nom | default('N/A') }}</td>
+                <td class="role-cell">
+                    {# Select box for roles - Corrected Logic #}
+                    <select name="role" class="role-select">
+                        {# Select Admin if ROLE_ADMIN is present #}
+                        <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Admin</option>
+                        {# Select User ONLY if ROLE_ADMIN is NOT present #}
+                        <option value="ROLE_USER" {% if 'ROLE_ADMIN' not in user.roles %}selected{% endif %}>User</option>
+                        {# Add other roles if needed, adjusting logic accordingly #}
+                    </select>
+                    <button class="btn-save-role" type="button">Save Role</button>
+                    <span class="save-status"></span> {# For showing save feedback #}
+                </td>
+                <td class="actions">
+                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}">Edit Profile</a>
+                    {# Prevent admin from deleting themselves #}
+                    {% if app.user != user %}
+                        {{ include('admin/user/_delete_form.html.twig', {'user_id': user.id}) }}
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no users found</td>
+                <td colspan="5">No users found</td> {# Adjusted colspan #}
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    #}
+{% endblock %}
 
-    {# Link to create new user? #}
-    {# <a href="{{ path('app_user_new') }}">Create new user</a> #}
-</div>
+{% block admin_javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.btn-save-role').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const row = event.target.closest('tr');
+                    const userId = row.dataset.userId;
+                    const selectElement = row.querySelector('.role-select');
+                    const selectedRole = selectElement.value;
+                    const statusSpan = row.querySelector('.save-status');
 
-{# Include the sidebar again if not in a shared admin base template #}
-{# {% include 'partials/_admin_sidebar.html.twig' %} #}
-{# Or ensure your admin base template includes it #}
+                    statusSpan.textContent = 'Saving...';
+                    statusSpan.className = 'save-status visible'; // Make it visible
 
+                    try {
+                        const response = await fetch(`/admin/users/${userId}/update-role`, { // Use template literal
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                // Include CSRF token if needed for this specific endpoint
+                                // 'X-CSRF-TOKEN': '{{ csrf_token("update_role") }}' // Removed user.id - variable not available here
+                            },
+                            // Send the single selected role as an array for consistency with backend expectation
+                            body: JSON.stringify({ roles: [selectedRole] })
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            statusSpan.textContent = 'Saved!';
+                            statusSpan.classList.add('save-success');
+                            statusSpan.classList.remove('save-error');
+                        } else {
+                            statusSpan.textContent = `Error: ${result.message || 'Failed to save'}`;
+                            statusSpan.classList.add('save-error');
+                            statusSpan.classList.remove('save-success');
+                        }
+                    } catch (error) {
+                        console.error('Error updating role:', error);
+                        statusSpan.textContent = 'Network Error';
+                        statusSpan.classList.add('save-error');
+                        statusSpan.classList.remove('save-success');
+                    }
+
+                    // Hide status message after a few seconds
+                    setTimeout(() => {
+                        statusSpan.classList.remove('visible');
+                        statusSpan.classList.remove('save-success', 'save-error'); 
+                        statusSpan.textContent = '';
+                    }, 3000); 
+                });
+            });
+        });
+    </script>
 {% endblock %} 

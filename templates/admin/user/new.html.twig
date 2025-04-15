@@ -1,0 +1,92 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block admin_title %}Create New User{% endblock %}
+
+{% block admin_stylesheets %}
+    {{ parent() }}
+    {# Add specific styles if needed, or use styles from index #}
+    <style>
+        .admin-form-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #2a2a3d; /* Dark bg */
+            color: #e0e0e6; /* Light text */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .admin-form-container h1 {
+             margin-bottom: 25px;
+             color: #7a7dfa; /* Accent */
+        }
+        .admin-form-container .form-group {
+            margin-bottom: 15px;
+        }
+        .admin-form-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .admin-form-container input[type="text"],
+        .admin-form-container input[type="email"],
+        .admin-form-container input[type="password"],
+        .admin-form-container input[type="tel"] {
+            width: 100%;
+            padding: 10px 15px;
+            background: #1e1e2d; /* Darker input bg */
+            border: 1px solid #36364a;
+            border-radius: 5px;
+            color: #e0e0e6;
+            font-size: 1rem;
+        }
+        .admin-form-container .btn {
+             padding: 10px 25px;
+             background-color: #7a7dfa; /* Accent */
+             color: #e0e0e6;
+             border-radius: 5px;
+             text-decoration: none;
+             font-weight: 500;
+             border: none;
+             cursor: pointer;
+             transition: background-color 0.2s ease;
+             margin-right: 10px; /* Space between buttons */
+        }
+        .admin-form-container .btn:hover {
+            background-color: #5e63ff; /* Slightly darker accent */
+        }
+        .admin-form-container .btn-back {
+            background-color: #42434a; /* Grey */
+        }
+        .admin-form-container .btn-back:hover {
+            background-color: #5a5b6a; /* Lighter grey */
+        }
+        .form-errors ul {
+            list-style: none;
+            padding: 5px 0 0 0;
+            margin: 0;
+            color: #ff6b6b; /* Red for errors */
+        }
+        .form-errors li {
+             font-size: 0.9em;
+        }
+
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+    <div class="admin-form-container">
+        <h1>Create New User</h1>
+
+        {{ form_start(registrationForm) }}
+            <div class="form-group">{{ form_row(registrationForm.prenom) }}</div>
+            <div class="form-group">{{ form_row(registrationForm.nom) }}</div>
+            <div class="form-group">{{ form_row(registrationForm.cin) }}</div>
+            <div class="form-group">{{ form_row(registrationForm.tel) }}</div>
+            <div class="form-group">{{ form_row(registrationForm.mail) }}</div>
+            <div class="form-group">{{ form_row(registrationForm.plainPassword) }}</div>
+            
+            <button type="submit" class="btn">Create User</button>
+            <a href="{{ path('admin_user_index') }}" class="btn btn-back">Back to List</a>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %} 
