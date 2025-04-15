@@ -75,6 +75,16 @@
             text-decoration: none;
         }
 
+                .response-button {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 10px 15px;
+            background-color:rgb(70, 101, 213);
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
         .create-button:hover {
             background-color: #218838;
         }
@@ -87,6 +97,8 @@
             <a href="{{ path('app_reclamation_new') }}" class="create-button">
                  <i class='bx bx-plus'></i> Créer une nouvelle réclamation
             </a>
+        <a href="{{ path('app_reponse_index') }}" class="response-button">Liste des Réponses </a>
+
         <h1>Liste des Réclamations</h1>
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">

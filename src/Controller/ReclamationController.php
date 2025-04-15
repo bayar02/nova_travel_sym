@@ -15,6 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/reclamation')]
 final class ReclamationController extends AbstractController
 {
+
+
+
+
     #[Route(name: 'app_reclamation_index', methods: ['GET'])]
     public function index(ReclamationRepository $reclamationRepository): Response
     {
@@ -83,4 +87,10 @@ final class ReclamationController extends AbstractController
 
         return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
     }
+  ////////////////////////////////////////////// FRONT //////////////////////////////////////
+
+
+
+
+
 }

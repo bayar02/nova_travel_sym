@@ -12,7 +12,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px; /* optionally increase width */
             margin: 60px auto;
             background-color: #ffffff;
             border-radius: 12px;
@@ -75,6 +75,21 @@
         .back-link:hover {
             text-decoration: underline;
         }
+
+        .form-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group.half {
+    flex: 1 1 45%;
+}
+
+textarea {
+    min-height: 100px;
+}
+
     </style>
 {% endblock %}
 

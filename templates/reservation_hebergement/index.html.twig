@@ -1,39 +1,145 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ReservationHebergement index{% endblock %}
+{% block title %}Liste des Reservations d'Hébergements{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .container-fluid-custom {
+            padding: 40px 60px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 10px;
+            min-width: 900px;
+        }
+
+        thead th {
+            background-color: #f3f3f3;
+            padding: 12px 16px;
+            text-align: left;
+            border-radius: 8px;
+        }
+
+        tbody tr {
+            background-color: #fafafa;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        tbody tr:hover {
+            transform: scale(1.005);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+
+        .create-button, .reservation-button {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .create-button {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .reservation-button {
+            background-color: rgb(70, 101, 213);
+            color: #fff;
+        }
+
+        .create-button:hover {
+            background-color: #218838;
+        }
+
+        .reservation-button:hover {
+            background-color: rgb(50, 80, 180);
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>ReservationHebergement index</h1>
+    <div class="container-fluid container-fluid-custom">
+        <a href="{{ path('app_reservation_hebergement_new') }}" class="create-button">
+            <i class='bx bx-plus'></i> Créer une nouvelle réservation
+        </a>
+        <a href="{{ path('app_hebergement_index') }}" class="reservation-button">Liste des Hébergements</a>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date_debut</th>
-                <th>Date_fin</th>
-                <th>Nb_perso</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for reservation_hebergement in reservation_hebergements %}
-            <tr>
-                <td>{{ reservation_hebergement.id }}</td>
-                <td>{{ reservation_hebergement.dateDebut ? reservation_hebergement.dateDebut|date('Y-m-d') : '' }}</td>
-                <td>{{ reservation_hebergement.dateFin ? reservation_hebergement.dateFin|date('Y-m-d') : '' }}</td>
-                <td>{{ reservation_hebergement.nbPerso }}</td>
-                <td>
-                    <a href="{{ path('app_reservation_hebergement_show', {'id': reservation_hebergement.id}) }}">show</a>
-                    <a href="{{ path('app_reservation_hebergement_edit', {'id': reservation_hebergement.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <h1>Liste des Réservations d'Hébergements</h1>
 
-    <a href="{{ path('app_reservation_hebergement_new') }}">Create new</a>
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Date Début</th>
+                                <th>Date Fin</th>
+                                <th>Nb Personnes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation_hebergement in reservation_hebergements %}
+                                <tr>
+                                    <td>{{ reservation_hebergement.id }}</td>
+                                    <td>{{ reservation_hebergement.dateDebut ? reservation_hebergement.dateDebut|date('Y-m-d') : '' }}</td>
+                                    <td>{{ reservation_hebergement.dateFin ? reservation_hebergement.dateFin|date('Y-m-d') : '' }}</td>
+                                    <td>{{ reservation_hebergement.nbPerso }}</td>
+                                    <td class="actions">
+                                        <a href="{{ path('app_reservation_hebergement_show', {'id': reservation_hebergement.id}) }}">
+                                            <i class='bx bx-show'></i> Show
+                                        </a>
+                                        <a href="{{ path('app_reservation_hebergement_edit', {'id': reservation_hebergement.id}) }}">
+                                            <i class='bx bx-edit'></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">Aucune réservation trouvée.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

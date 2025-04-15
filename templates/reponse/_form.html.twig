@@ -1,4 +1,17 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+
+<div class="form-group">
+    {{ form_label(form.message) }}
+    {{ form_widget(form.message) }}
+    <div style="color: red;">{{ form_errors(form.message) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.date_reponse) }}
+    {{ form_widget(form.date_reponse) }}
+    <div style="color: red;">{{ form_errors(form.date_reponse) }}</div>
+</div>
+
+<button class="btn">{{ button_label|default('Enregistrer') }}</button>
+
 {{ form_end(form) }}

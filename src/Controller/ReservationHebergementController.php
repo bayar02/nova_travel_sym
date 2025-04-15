@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+
 #[Route('/reservation/hebergement')]
 final class ReservationHebergementController extends AbstractController
 {
@@ -30,6 +31,8 @@ final class ReservationHebergementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $entityManager->getRepository(User::class)->find(1);
+
             $entityManager->persist($reservationHebergement);
             $entityManager->flush();
 

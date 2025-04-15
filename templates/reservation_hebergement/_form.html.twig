@@ -1,4 +1,29 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div class="form-group">
+    {{ form_label(form.date_debut) }}
+    {{ form_widget(form.date_debut) }}
+    <div style="color: red;">{{ form_errors(form.date_debut) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.date_fin) }}
+    {{ form_widget(form.date_fin) }}
+    <div style="color: red;">{{ form_errors(form.date_fin) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.nb_perso) }}
+    {{ form_widget(form.nb_perso) }}
+    <div style="color: red;">{{ form_errors(form.nb_perso) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.hebergement) }}
+    {{ form_widget(form.hebergement) }}
+    <div style="color: red;">{{ form_errors(form.hebergement) }}</div>
+</div>
+
+<button class="btn">{{ button_label|default('Enregistrer') }}</button>
+
 {{ form_end(form) }}
