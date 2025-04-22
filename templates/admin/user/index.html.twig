@@ -125,28 +125,66 @@
          }
           .save-success { color: #28a745; } /* Green */
           .save-error { color: #dc3545; } /* Red */
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #36364a;
+            border-radius: 5px;
+            background-color: #1e1e2d;
+            color: #e0e0e6;
+            flex: 1;
+            max-width: 300px;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #7a7dfa;
+        }
+        .sortable-header {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px;
+        }
+        .sortable-header::after {
+            content: '↕';
+            position: absolute;
+            right: 5px;
+            color: #7a7dfa;
+        }
+        .sortable-header.asc::after {
+            content: '↑';
+        }
+        .sortable-header.desc::after {
+            content: '↓';
+        }
     </style>
 {% endblock %}
 
 {% block admin_content %}
     <h1>User Management</h1>
 
-    <a href="{{ path('admin_user_new') }}" class="btn btn-create-user">Create New User</a>
+    <div class="search-container">
+        <input type="text" id="userSearch" class="search-input" placeholder="Search users...">
+        <a href="{{ path('admin_user_new') }}" class="btn btn-create-user">Create New User</a>
+    </div>
 
     <table class="admin-user-table">
         <thead>
             <tr>
-                {# ID column removed #}
-                <th>Email</th>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th class="sortable-header" data-sort="email">Email</th>
+                <th class="sortable-header" data-sort="prenom">First Name</th>
+                <th class="sortable-header" data-sort="nom">Last Name</th>
                 <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="userTableBody">
         {% for user in users %}
-            <tr data-user-id="{{ user.id }}"> {# Add user ID for JS targeting #}
+            <tr data-user-id="{{ user.id }}" data-email="{{ user.mail }}" data-prenom="{{ user.prenom }}" data-nom="{{ user.nom }}">
                 <td>{{ user.mail }}</td>
                 <td>{{ user.prenom | default('N/A') }}</td>
                 <td>{{ user.nom | default('N/A') }}</td>
@@ -172,7 +210,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">No users found</td> {# Adjusted colspan #}
+                <td colspan="5">No users found</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -229,6 +267,64 @@
                         statusSpan.classList.remove('save-success', 'save-error'); 
                         statusSpan.textContent = '';
                     }, 3000); 
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('userSearch');
+            const userTableBody = document.getElementById('userTableBody');
+            const userRows = Array.from(userTableBody.getElementsByTagName('tr'));
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                userRows.forEach(row => {
+                    const email = row.dataset.email.toLowerCase();
+                    const prenom = row.dataset.prenom?.toLowerCase() || '';
+                    const nom = row.dataset.nom?.toLowerCase() || '';
+                    
+                    if (email.includes(searchTerm) || 
+                        prenom.includes(searchTerm) || 
+                        nom.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Sorting functionality
+            const sortableHeaders = document.querySelectorAll('.sortable-header');
+            let currentSort = {
+                column: null,
+                direction: 'asc'
+            };
+
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    
+                    // Update sort indicators
+                    sortableHeaders.forEach(h => h.classList.remove('asc', 'desc'));
+                    header.classList.add(direction);
+                    
+                    // Sort the rows
+                    const rows = Array.from(userTableBody.getElementsByTagName('tr'));
+                    rows.sort((a, b) => {
+                        const aValue = a.dataset[column]?.toLowerCase() || '';
+                        const bValue = b.dataset[column]?.toLowerCase() || '';
+                        
+                        if (direction === 'asc') {
+                            return aValue.localeCompare(bValue);
+                        } else {
+                            return bValue.localeCompare(aValue);
+                        }
+                    });
+                    
+                    // Reorder the rows
+                    rows.forEach(row => userTableBody.appendChild(row));
+                    
+                    currentSort = { column, direction };
                 });
             });
         });
