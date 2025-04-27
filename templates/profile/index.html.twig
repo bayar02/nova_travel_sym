@@ -1,0 +1,134 @@
+{% extends 'user/base_user.html.twig' %}
+
+{% block user_title %}My Profile{% endblock %}
+
+{% block user_stylesheets %}
+    <style>
+        .profile-container {
+            padding: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 40px;
+            color: #666;
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .profile-name {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .profile-role {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 16px;
+        }
+        .profile-form {
+            background: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .form-error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block user_content %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-2xl font-bold mb-6">My Profile</h1>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Personal Information</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                            <p class="mt-1 text-lg">{{ app.user.prenom }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                            <p class="mt-1 text-lg">{{ app.user.nom }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                            <p class="mt-1 text-lg">{{ app.user.mail }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">CIN</label>
+                            <p class="mt-1 text-lg">{{ app.user.cin }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                            <p class="mt-1 text-lg">{{ app.user.tel }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Account Settings</h2>
+                    <div class="space-y-4">
+                        <a href="{{ path('app_profile_edit') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                            Edit Profile
+                        </a>
+                        <a href="{{ path('app_change_password') }}" class="inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-4">
+                            Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

@@ -1,41 +1,46 @@
 security:
     password_hashers:
-        App\Entity\User:
-            algorithm: auto
-
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     providers:
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: mail
-
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
         main:
             lazy: true
             provider: app_user_provider
-            entry_point: 'App\Security\AuthAuthenticator'
-
-
+            entry_point: form_login
             form_login:
-                login_path: login
-                check_path: login
+                login_path: app_login
+                check_path: app_login_check
+                enable_csrf: true
+            custom_authenticators:
+                - App\Security\FormLoginAuthenticator
+                - App\Security\OAuthAuthenticator
             logout:
-                path: logout
-                target: /
-            custom_authenticator: 'App\Security\AuthAuthenticator'
-
+                path: app_logout
+                target: app_login
+                invalidate_session: true
+                delete_cookies:
+                    PHPSESSID: { path: / }
+                    REMEMBERME: { path: / }
+                csrf_token_id: logout
+                csrf_parameter: _csrf_token
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
-                # by default, the feature is enabled by checking a checkbox in the
-                # login form, uncomment the following line to always enable it.
-                #always_remember_me: true
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/connect, roles: PUBLIC_ACCESS }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/, roles: ROLE_USER }

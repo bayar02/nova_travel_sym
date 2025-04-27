@@ -1,26 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% block admin_title %}Admin Area{% endblock %}{% endblock %}
+{% block title %}{% block user_title %}User Area{% endblock %}{% endblock %}
 
-{# Inherit global stylesheets/javascripts from base.html.twig #}
 {% block stylesheets %}
     {{ parent() }}
-    {# Add any CSS specific to the overall admin layout here #}
     <style>
-        /* Ensure content doesn't get hidden behind fixed sidebar */
-        .admin-content-wrapper {
-            padding-left: 60px; /* Start with closed sidebar width */
-            transition: padding-left 300ms ease-in-out; /* Match sidebar transition */
+        .user-content-wrapper {
+            padding-left: 60px;
+            transition: padding-left 300ms ease-in-out;
         }
-        #admin-sidebar:not(.close) + .admin-content-wrapper {
-            padding-left: 250px; /* Adjust padding when sidebar is open */
+        #user-sidebar:not(.close) + .user-content-wrapper {
+            padding-left: 250px;
         }
-        /* Basic styling for flash messages */
         .flash-messages {
             position: fixed;
             top: 10px;
             right: 10px;
-            z-index: 1050; /* Above sidebar */
+            z-index: 1050;
         }
         .flash-message {
             padding: 10px 20px;
@@ -35,40 +31,28 @@
         .flash-warning { background-color: #ffc107; color: #333;}
         .flash-info { background-color: #17a2b8; }
     </style>
-    {% block admin_stylesheets %}{% endblock %}
+    {% block user_stylesheets %}{% endblock %}
 {% endblock %}
 
 {% block body %}
-    {# Admin Sidebar - Included once here #}
-    <nav id="admin-sidebar"> {# Keep ID for CSS/JS #}
+    {# User Sidebar #}
+    <nav id="user-sidebar">
         <ul>
             <li>
-                {# Toggle Button #}
-                <button id="admin-sidebar-toggle-btn" title="Toggle Sidebar">
+                <button id="user-sidebar-toggle-btn" title="Toggle Sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                         <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
                     </svg>
                 </button>
             </li>
-            {# Admin Dashboard Home Link #}
-            <li class="{% if app.request.attributes.get('_route') == 'admin_dashboard' %}active{% endif %}">
-                <a href="{{ path('admin_dashboard') }}">
+            <li class="{% if app.request.attributes.get('_route') == 'user_dashboard' %}active{% endif %}">
+                <a href="{{ path('user_dashboard') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                         <path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z"/>
                     </svg>
                     <span>Home</span>
                 </a>
             </li>
-            {# User Management Link #}
-            <li class="{% if app.request.attributes.get('_route') starts with 'admin_user_' %}active{% endif %}">
-                <a href="{{ path('admin_user_index') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
-                    </svg>
-                    <span>User Management</span>
-                </a>
-            </li>
-            {# Profile Link #}
             <li class="{% if app.request.attributes.get('_route') == 'app_profile' %}active{% endif %}">
                 <a href="{{ path('app_profile') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -77,9 +61,6 @@
                     <span>My Profile</span>
                 </a>
             </li>
-            {# Add more admin links as needed #}
-
-            {# Logout Button #}
             <li class="logout-item">
                 <button class="logoutButton logoutButton--dark" type="button" title="Log Out">
                     <svg class="doorway" viewBox="0 0 100 100"><path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z"></path><path class="bang" d="M40.5 43.7L26.6 31.4l-2.5 6.7zM41.9 50.4l-19.5-4-1.4 6.3zM40 57.4l-17.7 3.9 3.9 5.7z"></path></svg>
@@ -102,17 +83,15 @@
         {% endfor %}
     </div>
 
-    {# Main Content Area for Admin Pages #}
-    <div class="admin-content-wrapper">
-        {% block admin_content %}
-            {# Specific admin page content goes here #}
+    {# Main Content Area for User Pages #}
+    <div class="user-content-wrapper">
+        {% block user_content %}
+            {# Specific user page content goes here #}
         {% endblock %}
     </div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }} 
-    {# Global admin_sidebar.js is loaded via app.js -> importmap('app') #}
-    {# Add any JS specific to the overall admin layout here #}
-    {% block admin_javascripts %}{% endblock %}
+    {{ parent() }}
+    {% block user_javascripts %}{% endblock %}
 {% endblock %} 

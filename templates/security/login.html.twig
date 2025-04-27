@@ -3,15 +3,94 @@
 {% block title %}Welcome to Bayar{% endblock %}
 
 {% block stylesheets %}
-    {# {{ parent() }} #} {# No need for parent usually if overriding #}
-    {# Removed direct link - auth.css is imported via app.js/app.css #}
-    {# <link rel="stylesheet" href="{{ asset('assets/styles/auth.css') }}"> #}
+    {{ parent() }}
+    <style>
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-icons .facebook {
+            background-color: #1877f2;
+            color: white;
+        }
+        .social-icons .google {
+            background-color: #ea4335;
+            color: white;
+        }
+        .social-icons a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .forgot-link a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+        .divider {
+            text-align: center;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: #ddd;
+        }
+        .divider::before {
+            left: 0;
+        }
+        .divider::after {
+            right: 0;
+        }
+        .input-box {
+            position: relative;
+        }
+        .input-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .input-box input {
+            padding-left: 35px;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
     <div class="container" data-controller="auth">
         <div class="form-box login">
-            <form method="post" action="{{ path('login') }}">
+            <form method="post">
                 {# CSRF Token required by AuthAuthenticator #}
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                 
@@ -24,26 +103,33 @@
                 <div class="input-box">
                     {# Use name="mail" as expected by AuthAuthenticator #}
                     <input type="text" value="{{ last_username }}" name="mail" placeholder="Email" required autofocus autocomplete="username">
-                    <i class='bx bxs-user'></i>
+                    <i class="fas fa-user"></i>
                 </div>
                 <div class="input-box">
                     {# Use name="password" as expected by AuthAuthenticator #}
                     <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
-                    <i class='bx bxs-lock-alt' ></i>
+                    <i class="fas fa-lock"></i>
                 </div>
-                {# Add Remember Me checkbox if needed #}
-                {# <div class="remember-me"><input type="checkbox" name="_remember_me" checked> Remember me</div> #}
                 
-                <div class="forgot-link">
-                    <a href="#">Forgot Password?</a>
+                <div class="login-options">
+                    <div class="remember-me">
+                        <input type="checkbox" name="_remember_me" id="remember_me">
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    
                 </div>
+                
                 <button type="submit" class="btn">Login</button>
-                <p>or login with social platforms</p>
+                
+                <div class="divider">or</div>
+                
                 <div class="social-icons">
-                    <a href="#"><i class='bx bxl-google' ></i></a>
-                    <a href="#"><i class='bx bxl-facebook' ></i></a>
-                    <a href="#"><i class='bx bxl-github' ></i></a>
-                    <a href="#"><i class='bx bxl-linkedin' ></i></a>
+                    <a href="{{ path('connect_facebook') }}" class="facebook" title="Login with Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="{{ path('connect_google') }}" class="google" title="Login with Google">
+                        <i class="fab fa-google"></i>
+                    </a>
                 </div>
             </form>
         </div>
@@ -53,32 +139,32 @@
                 <h1>Registration</h1>
                 <div class="input-box">
                     {{ form_widget(registrationForm.prenom, {'attr': {'placeholder': 'First Name'}}) }}
-                    <i class='bx bxs-user'></i>
+                    <i class="fas fa-user"></i>
                     {{ form_errors(registrationForm.prenom) }}
                 </div>
                 <div class="input-box">
                     {{ form_widget(registrationForm.nom, {'attr': {'placeholder': 'Last Name'}}) }}
-                    <i class='bx bxs-user'></i>
+                    <i class="fas fa-user"></i>
                     {{ form_errors(registrationForm.nom) }}
                 </div>
                 <div class="input-box">
                     {{ form_widget(registrationForm.cin, {'attr': {'placeholder': 'CIN'}}) }}
-                    <i class='bx bxs-id-card'></i>
+                    <i class="fas fa-id-card"></i>
                     {{ form_errors(registrationForm.cin) }}
                 </div>
                 <div class="input-box">
                     {{ form_widget(registrationForm.tel, {'attr': {'placeholder': 'Telephone'}}) }}
-                    <i class='bx bxs-phone'></i>
+                    <i class="fas fa-phone"></i>
                     {{ form_errors(registrationForm.tel) }}
                 </div>
                 <div class="input-box">
                     {{ form_widget(registrationForm.mail, {'attr': {'placeholder': 'Email'}}) }}
-                    <i class='bx bxs-envelope' ></i>
+                    <i class="fas fa-envelope"></i>
                     {{ form_errors(registrationForm.mail) }}
                 </div>
                 <div class="input-box">
                     {{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Password', 'autocomplete': 'new-password'}}) }}
-                    <i class='bx bxs-lock-alt' ></i>
+                    <i class="fas fa-lock"></i>
                     {{ form_errors(registrationForm.plainPassword) }}
                 </div>
                 <button type="submit" class="btn">Register</button>
