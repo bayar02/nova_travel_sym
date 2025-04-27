@@ -25,18 +25,16 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            # Remove form_login section as AuthAuthenticator handles it
-            # form_login:
-            #     login_path: app_login
-            #     check_path: app_login 
-            #     # success_handler: App\Security\LoginSuccessHandler # Removed
-            
+            entry_point: 'App\Security\AuthAuthenticator'
+
+
+            form_login:
+                login_path: login
+                check_path: login
             logout:
-                path: app_logout
-                target: app_login # Redirect back to login on logout
-            
-            # Explicitly use the custom authenticator
-            custom_authenticator: App\Security\AuthAuthenticator
+                path: logout
+                target: /
+            custom_authenticator: 'App\Security\AuthAuthenticator'
 
             remember_me:
                 secret: '%kernel.secret%'
@@ -49,3 +47,4 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/connect, roles: PUBLIC_ACCESS }

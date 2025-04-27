@@ -78,4 +78,30 @@ final class UserController extends AbstractController
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/search', name: 'app_user_search', methods: ['GET'])]
+    public function search(UserRepository $userRepository): Response
+    {
+        $users = $userRepository->searchUsers('john');
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
+    #[Route('/sort', name: 'app_user_sort', methods: ['GET'])] 
+    public function sort(UserRepository $userRepository): Response
+    {
+        $users = $userRepository->sortUsers('nom', 'ASC');
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+        ]);
+    }
+    #[Route('/search-sort', name: 'app_user_search_sort', methods: ['GET'])]
+    public function searchAndSort(UserRepository $userRepository): Response 
+    {
+        $users = $userRepository->searchAndSortUsers('john', 'nom', 'ASC');
+        return $this->render('user/index.html.twig', [
+            'users' => $users,
+        ]);
+    }
 }

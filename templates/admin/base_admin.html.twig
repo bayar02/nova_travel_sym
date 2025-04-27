@@ -103,7 +103,13 @@
 
 {% block javascripts %}
     {{ parent() }} 
+<script> 
     {# Global admin_sidebar.js is loaded via app.js -> importmap('app') #}
+    document.addEventListener("DOMContentLoaded", () => {
+        const sidebar = document.getElementById("admin-sidebar");
+        sidebar.classList.add("close");
+      });
+</script>      
     {# Add any JS specific to the overall admin layout here #}
     {% block admin_javascripts %}{% endblock %}
 {% endblock %} 
