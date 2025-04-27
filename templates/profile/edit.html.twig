@@ -1,55 +1,212 @@
-{% extends 'user/base_user.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block user_title %}Edit Profile{% endblock %}
+{% block title %}Edit Profile{% endblock %}
 
-{% block user_content %}
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold mb-6">Edit Profile</h1>
-        
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            {{ form_start(form) }}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        {{ form_row(form.prenom, {
-                            'attr': {'class': 'w-full px-3 py-2 border rounded-md'},
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 dark:text-gray-300'}
-                        }) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.nom, {
-                            'attr': {'class': 'w-full px-3 py-2 border rounded-md'},
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 dark:text-gray-300'}
-                        }) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.cin, {
-                            'attr': {'class': 'w-full px-3 py-2 border rounded-md'},
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 dark:text-gray-300'}
-                        }) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.tel, {
-                            'attr': {'class': 'w-full px-3 py-2 border rounded-md'},
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 dark:text-gray-300'}
-                        }) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.mail, {
-                            'attr': {'class': 'w-full px-3 py-2 border rounded-md'},
-                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 dark:text-gray-300'}
-                        }) }}
-                    </div>
-                </div>
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+        }
+        .profile-container {
+            min-height: calc(100vh - 64px);
+            padding: 2rem;
+            background: #1a1a1a;
+            margin-left: 64px;
+        }
+        .profile-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .profile-header {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .profile-header h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-transform: lowercase;
+        }
+        .form-container {
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: #2a2a2a;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #4e54c8;
+        }
+        .action-buttons {
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+        .save-button {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .save-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.4);
+        }
+        .cancel-button {
+            background: #2a2a2a;
+            color: white;
+        }
+        .cancel-button:hover {
+            background: #333;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+{% endblock %}
 
-                <div class="mt-6">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                        Update Profile
-                    </button>
-                    <a href="{{ path('app_profile') }}" class="ml-4 text-gray-600 hover:text-gray-800">
-                        Cancel
+{% block body %}
+    <nav id="admin-sidebar">
+        <ul>
+            <li>
+                <button id="admin-sidebar-toggle-btn" title="Toggle Sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
+                    </svg>
+                </button>
+            </li>
+            {# Home Link - Different for admin and regular users #}
+            <li class="{% if app.request.attributes.get('_route') == 'admin_dashboard' or app.request.attributes.get('_route') == 'user_dashboard' %}active{% endif %}">
+                <a href="{{ is_granted('ROLE_ADMIN') ? path('admin_dashboard') : path('user_dashboard') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z"/>
+                    </svg>
+                    <span>Home</span>
+                </a>
+            </li>
+            {# User Management Link - Only for admins #}
+            {% if is_granted('ROLE_ADMIN') %}
+                <li class="{% if app.request.attributes.get('_route') starts with 'admin_user_' %}active{% endif %}">
+                    <a href="{{ path('admin_user_index') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                            <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+                        </svg>
+                        <span>User Management</span>
                     </a>
+                </li>
+            {% endif %}
+            {# Profile Link #}
+            <li class="{% if app.request.attributes.get('_route') == 'app_profile' %}active{% endif %}">
+                <a href="{{ path('app_profile') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+                    </svg>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            {# Logout Button #}
+            <li class="logout-item">
+                <button class="logoutButton logoutButton--dark" type="button" title="Log Out">
+                    <svg class="doorway" viewBox="0 0 100 100"><path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z"></path><path class="bang" d="M40.5 43.7L26.6 31.4l-2.5 6.7zM41.9 50.4l-19.5-4-1.4 6.3zM40 57.4l-17.7 3.9 3.9 5.7z"></path></svg>
+                    <svg class="figure" viewBox="0 0 100 100"><circle cx="52.1" cy="32.4" r="6.4"></circle><path d="M50.7 62.8c-1.2 2.5-3.6 5-7.2 4-3.2-.9-4.9-3.5-4-7.8.7-3.4 3.1-13.8 4.1-15.8 1.7-3.4 1.6-4.6 7-3.7 4.3.7 4.6 2.5 4.3 5.4-.4 3.7-2.8 15.1-4.2 17.9z"></path><g class="arm1"><path d="M55.5 56.5l-6-9.5c-1-1.5-.6-3.5.9-4.4 1.5-1 3.7-1.1 4.6.4l6.1 10c1 1.5.3 3.5-1.1 4.4-1.5.9-3.5.5-4.5-.9z"></path><path class="wrist1" d="M69.4 59.9L58.1 58c-1.7-.3-2.9-1.9-2.6-3.7.3-1.7 1.9-2.9 3.7-2.6l11.4 1.9c1.7.3 2.9 1.9 2.6 3.7-.4 1.7-2 2.9-3.8 2.6z"></path></g><g class="arm2"><path d="M34.2 43.6L45 40.3c1.7-.6 3.5.3 4 2 .6 1.7-.3 4-2 4.5l-10.8 2.8c-1.7.6-3.5-.3-4-2-.6-1.6.3-3.4 2-4z"></path><path class="wrist2" d="M27.1 56.2L32 45.7c.7-1.6 2.6-2.3 4.2-1.6 1.6.7 2.3 2.6 1.6 4.2L33 58.8c-.7 1.6-2.6 2.3-4.2 1.6-1.7-.7-2.4-2.6-1.7-4.2z"></path></g><g class="leg1"><path d="M52.1 73.2s-7-5.7-7.9-6.5c-.9-.9-1.2-3.5-.1-4.9 1.1-1.4 3.8-1.9 5.2-.9l7.9 7c1.4 1.1 1.7 3.5.7 4.9-1.1 1.4-4.4 1.5-5.8.4z"></path><path class="calf1" d="M52.6 84.4l-1-12.8c-.1-1.9 1.5-3.6 3.5-3.7 2-.1 3.7 1.4 3.8 3.4l1 12.8c.1 1.9-1.5 3.6-3.5 3.7-2 0-3.7-1.5-3.8-3.4z"></path></g><g class="leg2"><path d="M37.8 72.7s1.3-10.2 1.6-11.4 2.4-2.8 4.1-2.6c1.7.2 3.6 2.3 3.4 4l-1.8 11.1c-.2 1.7-1.7 3.3-3.4 3.1-1.8-.2-4.1-2.4-3.9-4.2z"></path><path class="calf2" d="M29.5 82.3l9.6-10.9c1.3-1.4 3.6-1.5 5.1-.1 1.5 1.4.4 4.9-.9 6.3l-8.5 9.6c-1.3 1.4-3.6 1.5-5.1.1-1.4-1.3-1.5-3.5-.2-5z"></path></g></svg>
+                    <svg class="door" viewBox="0 0 100 100"><path d="M93.4 86.3H58.6c-1.9 0-3.4-1.5-3.4-3.4V17.1c0-1.9 1.5-3.4 3.4-3.4h34.8c1.9 0 3.4 1.5 3.4 3.4v65.8c0 1.9-1.5 3.4-3.4 3.4z"></path><circle cx="66" cy="50" r="3.7"></circle></svg>
+                    <span class="button-text">Log Out</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    {# Flash Messages Display #}
+    <div class="flash-messages">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="flash-message flash-{{ label }}">
+                    {{ message }}
                 </div>
-            {{ form_end(form) }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h1>Edit Profile</h1>
+            </div>
+            
+            <div class="form-container">
+                {{ form_start(form) }}
+                    <div class="form-group">
+                        {{ form_label(form.prenom, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-input'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.nom, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-input'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.cin, 'CIN', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.cin, {'attr': {'class': 'form-input'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.tel, 'Phone', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.tel, {'attr': {'class': 'form-input'}}) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.mail, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.mail, {'attr': {'class': 'form-input'}}) }}
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="action-button save-button">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                        <a href="{{ path('app_profile') }}" class="action-button cancel-button">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
         </div>
     </div>
 {% endblock %} 
