@@ -12,7 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Knp\Component\Pager\PaginatorInterface;
-
+use Knp\Snappy\Pdf;
+use Doctrine\ORM\Mapping as ORM;
+use Knp\Snappy\Pdf as SnappyPdf;
+use Knp\Snappy\Pdf\Response as PdfResponse;
+use Dompdf\Dompdf;
 #[Route('/reclamation')]
 final class ReclamationController extends AbstractController
 {
@@ -29,7 +33,7 @@ final class ReclamationController extends AbstractController
     $reclamations = $paginator->paginate(
         $query,
         $request->query->getInt('page', 1), 
-        3 
+        3 // number of items per page
     );
 
     return $this->render('reclamation/index.html.twig', [
@@ -98,7 +102,30 @@ final class ReclamationController extends AbstractController
         return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
     }
   ////////////////////////////////////////////// FRONT //////////////////////////////////////
-
+  #[Route('/reclamation/{id}/pdf', name: 'reclamation_pdf')]
+  public function reclamationPdf(int $id, EntityManagerInterface $entityManager): Response
+  {
+      // Récupérer le régime concerné
+      $reclamation = $entityManager->getRepository(Reclamation::class)->find($id);
+  
+     
+      // Générer le HTML pour le régime
+      $html = $this->renderView('reclamation/reclamation_pdf.html.twig', [
+          'reclamation' => $reclamation,
+      ]);
+  
+      // Configurer Dompdf
+      $dompdf = new Dompdf();
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'portrait');
+      $dompdf->render();
+  
+      // Retourner le PDF en réponse
+      return new Response($dompdf->output(), 200, [
+          'Content-Type' => 'application/pdf',
+          'Content-Disposition' => 'inline; filename="reclamation_' . $reclamation->getId() . '.pdf"',
+      ]);
+  }
 
 
 

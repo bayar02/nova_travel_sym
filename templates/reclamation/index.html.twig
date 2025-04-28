@@ -127,6 +127,9 @@
                                         <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}">
                                             <i class='bx bx-edit'></i> Edit
                                         </a>
+                                        <a href="{{ path('reclamation_pdf', {'id': reclamation.id}) }}" target="_blank" class="btn btn-primary">
+    Télécharger le PDF
+</a>
                                     </td>
                                 </tr>
                             {% else %}
