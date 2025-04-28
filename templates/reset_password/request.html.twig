@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forgot Password{% endblock %}
+{% block body %}
+<div class="container mt-5" style="background-color: #ffffff; color: #000000; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-4" style="color: #333;">🔑 Forgot your password?</h2>
+
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="alert alert-danger" role="alert">
+                {{ flash_error }}
+            </div>
+        {% endfor %}
+
+        <p class="text-center text-muted mb-4">
+            Enter your email address below.<br> We will send you a reset link.
+        </p>
+
+        {{ form_start(requestForm) }}
+            <div class="mb-3">
+                {{ form_label(requestForm.mail, 'Email Address') }}
+                {{ form_widget(requestForm.mail, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(requestForm.mail) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Send Reset Link</button>
+        {{ form_end(requestForm) }}
+    </div>
+</div>
+{% endblock %}

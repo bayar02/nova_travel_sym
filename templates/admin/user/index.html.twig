@@ -130,6 +130,7 @@
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .search-input {
             padding: 10px 15px;
@@ -144,22 +145,43 @@
             outline: none;
             border-color: #7a7dfa;
         }
-        .sortable-header {
-            cursor: pointer;
-            position: relative;
-            padding-right: 20px;
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #36364a;
+            border-radius: 5px;
+            background-color: #1e1e2d;
+            color: #e0e0e6;
+            min-width: 150px;
         }
-        .sortable-header::after {
-            content: '↕';
-            position: absolute;
-            right: 5px;
-            color: #7a7dfa;
+        .filter-select:focus {
+            outline: none;
+            border-color: #7a7dfa;
         }
-        .sortable-header.asc::after {
-            content: '↑';
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
         }
-        .sortable-header.desc::after {
-            content: '↓';
+        .pagination a {
+            padding: 8px 15px;
+            background-color: #1e1e2d;
+            color: #e0e0e6;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .pagination a:hover {
+            background-color: #5e63ff;
+            color: #fff;
+        }
+        .pagination .active {
+            background-color: #5e63ff;
+            color: #fff;
+        }
+        .pagination .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 {% endblock %}
@@ -168,41 +190,47 @@
     <h1>User Management</h1>
 
     <div class="search-container">
-        <input type="text" id="userSearch" class="search-input" placeholder="Search users...">
+        <input type="text" id="userSearch" class="search-input" placeholder="Search users..." value="{{ searchQuery }}">
+        <button id="searchButton" class="btn-create-user" style="padding: 10px 20px; margin-bottom: 0;">Search</button>
+        <select id="roleFilter" class="filter-select">
+            <option value="">All Roles</option>
+            <option value="ROLE_ADMIN" {% if roleFilter == 'ROLE_ADMIN' %}selected{% endif %}>Admin</option>
+            <option value="ROLE_USER" {% if roleFilter == 'ROLE_USER' %}selected{% endif %}>User</option>
+        </select>
+        <select id="verifiedFilter" class="filter-select">
+            <option value="">All Users</option>
+            <option value="1" {% if verifiedFilter == '1' %}selected{% endif %}>Verified</option>
+            <option value="0" {% if verifiedFilter == '0' %}selected{% endif %}>Unverified</option>
+        </select>
         <a href="{{ path('admin_user_new') }}" class="btn btn-create-user">Create New User</a>
     </div>
 
     <table class="admin-user-table">
         <thead>
             <tr>
-                <th class="sortable-header" data-sort="email">Email</th>
-                <th class="sortable-header" data-sort="prenom">First Name</th>
-                <th class="sortable-header" data-sort="nom">Last Name</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody id="userTableBody">
-        {% for user in users %}
-            <tr data-user-id="{{ user.id }}" data-email="{{ user.mail }}" data-prenom="{{ user.prenom }}" data-nom="{{ user.nom }}">
+        {% for user in pagination %}
+            <tr data-user-id="{{ user.id }}" data-email="{{ user.mail }}" data-prenom="{{ user.prenom }}" data-nom="{{ user.nom }}" data-role="{{ user.roles|join(',') }}" data-verified="{{ user.isVerified ? '1' : '0' }}">
                 <td>{{ user.mail }}</td>
                 <td>{{ user.prenom | default('N/A') }}</td>
                 <td>{{ user.nom | default('N/A') }}</td>
                 <td class="role-cell">
-                    {# Select box for roles - Corrected Logic #}
                     <select name="role" class="role-select">
-                        {# Select Admin if ROLE_ADMIN is present #}
                         <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Admin</option>
-                        {# Select User ONLY if ROLE_ADMIN is NOT present #}
                         <option value="ROLE_USER" {% if 'ROLE_ADMIN' not in user.roles %}selected{% endif %}>User</option>
-                        {# Add other roles if needed, adjusting logic accordingly #}
                     </select>
                     <button class="btn-save-role" type="button">Save Role</button>
-                    <span class="save-status"></span> {# For showing save feedback #}
+                    <span class="save-status"></span>
                 </td>
                 <td class="actions">
                     <a href="{{ path('admin_user_edit', {'id': user.id}) }}">Edit Profile</a>
-                    {# Prevent admin from deleting themselves #}
                     {% if app.user != user %}
                         {{ include('admin/user/_delete_form.html.twig', {'user_id': user.id}) }}
                     {% endif %}
@@ -215,11 +243,16 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div class="pagination">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 {% endblock %}
 
 {% block admin_javascripts %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Role update functionality
             document.querySelectorAll('.btn-save-role').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     const row = event.target.closest('tr');
@@ -229,17 +262,14 @@
                     const statusSpan = row.querySelector('.save-status');
 
                     statusSpan.textContent = 'Saving...';
-                    statusSpan.className = 'save-status visible'; // Make it visible
+                    statusSpan.className = 'save-status visible';
 
                     try {
-                        const response = await fetch(`/admin/users/${userId}/update-role`, { // Use template literal
+                        const response = await fetch(`/admin/users/${userId}/update-role`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                // Include CSRF token if needed for this specific endpoint
-                                // 'X-CSRF-TOKEN': '{{ csrf_token("update_role") }}' // Removed user.id - variable not available here
                             },
-                            // Send the single selected role as an array for consistency with backend expectation
                             body: JSON.stringify({ roles: [selectedRole] })
                         });
 
@@ -261,72 +291,50 @@
                         statusSpan.classList.remove('save-success');
                     }
 
-                    // Hide status message after a few seconds
                     setTimeout(() => {
                         statusSpan.classList.remove('visible');
-                        statusSpan.classList.remove('save-success', 'save-error'); 
+                        statusSpan.classList.remove('save-success', 'save-error');
                         statusSpan.textContent = '';
-                    }, 3000); 
+                    }, 3000);
                 });
             });
 
-            // Search functionality
+            // Search and filter functionality
             const searchInput = document.getElementById('userSearch');
-            const userTableBody = document.getElementById('userTableBody');
-            const userRows = Array.from(userTableBody.getElementsByTagName('tr'));
+            const searchButton = document.getElementById('searchButton');
+            const roleFilter = document.getElementById('roleFilter');
+            const verifiedFilter = document.getElementById('verifiedFilter');
 
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                userRows.forEach(row => {
-                    const email = row.dataset.email.toLowerCase();
-                    const prenom = row.dataset.prenom?.toLowerCase() || '';
-                    const nom = row.dataset.nom?.toLowerCase() || '';
-                    
-                    if (email.includes(searchTerm) || 
-                        prenom.includes(searchTerm) || 
-                        nom.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+            function updateFilters() {
+                const searchQuery = searchInput.value;
+                const roleValue = roleFilter.value;
+                const verifiedValue = verifiedFilter.value;
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('search', searchQuery);
+                url.searchParams.set('role', roleValue);
+                url.searchParams.set('verified', verifiedValue);
+                url.searchParams.set('page', '1'); // Reset to first page when filtering
+
+                window.location.href = url.toString();
+            }
+
+            // Trigger search on button click
+            searchButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                updateFilters();
             });
 
-            // Sorting functionality
-            const sortableHeaders = document.querySelectorAll('.sortable-header');
-            let currentSort = {
-                column: null,
-                direction: 'asc'
-            };
-
-            sortableHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const column = header.dataset.sort;
-                    const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    
-                    // Update sort indicators
-                    sortableHeaders.forEach(h => h.classList.remove('asc', 'desc'));
-                    header.classList.add(direction);
-                    
-                    // Sort the rows
-                    const rows = Array.from(userTableBody.getElementsByTagName('tr'));
-                    rows.sort((a, b) => {
-                        const aValue = a.dataset[column]?.toLowerCase() || '';
-                        const bValue = b.dataset[column]?.toLowerCase() || '';
-                        
-                        if (direction === 'asc') {
-                            return aValue.localeCompare(bValue);
-                        } else {
-                            return bValue.localeCompare(aValue);
-                        }
-                    });
-                    
-                    // Reorder the rows
-                    rows.forEach(row => userTableBody.appendChild(row));
-                    
-                    currentSort = { column, direction };
-                });
+            // Trigger search on Enter key in search input
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    updateFilters();
+                }
             });
+
+            roleFilter.addEventListener('change', updateFilters);
+            verifiedFilter.addEventListener('change', updateFilters);
         });
         document.addEventListener("DOMContentLoaded", () => {
             const sidebar = document.getElementById("admin-sidebar");
