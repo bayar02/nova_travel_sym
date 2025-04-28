@@ -1,3 +1,6 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: 'bayaraziz2001@gmail.com'
+        headers:
+            X-Transport: smtp

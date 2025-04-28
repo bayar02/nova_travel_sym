@@ -113,10 +113,12 @@
                 
                 <div class="login-options">
                     <div class="remember-me">
-                        <input type="checkbox" name="_remember_me" id="remember_me">
+                        <input type="checkbox" name="_remember_me" checked>
                         <label for="remember_me">Remember me</label>
                     </div>
-                    
+                    <div class="forgot-link">
+                        <a href="{{ path('app_forgot_password_request') }}">Forgot password?</a>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn">Login</button>

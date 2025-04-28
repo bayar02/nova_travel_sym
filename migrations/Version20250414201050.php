@@ -36,9 +36,6 @@ final class Version20250414201050 extends AbstractMigration
             ALTER TABLE reponse DROP FOREIGN KEY reponse_ibfk_1
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE reponse DROP FOREIGN KEY reponse_ibfk_1
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE reponse CHANGE id_reclamation id_reclamation INT DEFAULT NULL
         SQL);
         $this->addSql(<<<'SQL'
@@ -52,12 +49,6 @@ final class Version20250414201050 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reponse ADD CONSTRAINT reponse_ibfk_1 FOREIGN KEY (id_reclamation) REFERENCES reclamation (id) ON DELETE CASCADE
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_hebergement DROP FOREIGN KEY reservation_hebergement_ibfk_1
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_hebergement DROP FOREIGN KEY reservation_hebergement_ibfk_2
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reservation_hebergement DROP FOREIGN KEY reservation_hebergement_ibfk_1
@@ -91,12 +82,6 @@ final class Version20250414201050 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reservation_hebergement ADD CONSTRAINT reservation_hebergement_ibfk_2 FOREIGN KEY (id_hebergement) REFERENCES hebergement (id) ON DELETE CASCADE
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_vol DROP FOREIGN KEY reservation_vol_ibfk_1
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_vol DROP FOREIGN KEY reservation_vol_ibfk_2
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reservation_vol DROP FOREIGN KEY reservation_vol_ibfk_1
@@ -152,9 +137,6 @@ final class Version20250414201050 extends AbstractMigration
             ALTER TABLE reclamation DROP FOREIGN KEY FK_CE6064046B3CA4B
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE reclamation DROP FOREIGN KEY FK_CE6064046B3CA4B
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE reclamation CHANGE id_user id_user INT NOT NULL, CHANGE date_reclamation date_reclamation DATE NOT NULL
         SQL);
         $this->addSql(<<<'SQL'
@@ -165,9 +147,6 @@ final class Version20250414201050 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reclamation ADD CONSTRAINT FK_CE6064046B3CA4B FOREIGN KEY (id_user) REFERENCES user (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reponse DROP FOREIGN KEY FK_5FB6DEC7D672A9F3
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reponse DROP FOREIGN KEY FK_5FB6DEC7D672A9F3
@@ -186,12 +165,6 @@ final class Version20250414201050 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reponse ADD CONSTRAINT FK_5FB6DEC7D672A9F3 FOREIGN KEY (id_reclamation) REFERENCES reclamation (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_hebergement DROP FOREIGN KEY FK_843E00C06B3CA4B
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_hebergement DROP FOREIGN KEY FK_843E00C05040106B
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE reservation_hebergement DROP FOREIGN KEY FK_843E00C06B3CA4B
@@ -233,12 +206,6 @@ final class Version20250414201050 extends AbstractMigration
             ALTER TABLE reservation_vol DROP FOREIGN KEY FK_5C5EBA3497F87FB1
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_vol DROP FOREIGN KEY FK_5C5EBA346B3CA4B
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE reservation_vol DROP FOREIGN KEY FK_5C5EBA3497F87FB1
-        SQL);
-        $this->addSql(<<<'SQL'
             ALTER TABLE reservation_vol CHANGE id_user id_user INT NOT NULL, CHANGE id_vol id_vol INT NOT NULL, CHANGE classe classe VARCHAR(50) NOT NULL
         SQL);
         $this->addSql(<<<'SQL'
@@ -266,16 +233,16 @@ final class Version20250414201050 extends AbstractMigration
             ALTER TABLE reservation_vol ADD CONSTRAINT FK_5C5EBA3497F87FB1 FOREIGN KEY (id_vol) REFERENCES vol (id)
         SQL);
         $this->addSql(<<<'SQL'
-            DROP INDEX UNIQ_8D93D6495126AC48 ON user
+            DROP INDEX uniq_8d93d6495126ac48 ON user
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE user ADD role VARCHAR(50) NOT NULL, DROP roles, DROP is_verified, CHANGE mail mail VARCHAR(255) NOT NULL, CHANGE nom nom VARCHAR(50) NOT NULL, CHANGE prenom prenom VARCHAR(50) NOT NULL, CHANGE cin cin VARCHAR(20) DEFAULT NULL, CHANGE tel tel INT DEFAULT NULL
+            ALTER TABLE user DROP roles, DROP is_verified, ADD role VARCHAR(255) NOT NULL, CHANGE nom nom VARCHAR(255) DEFAULT NULL, CHANGE prenom prenom VARCHAR(255) DEFAULT NULL, CHANGE cin cin VARCHAR(255) DEFAULT NULL, CHANGE mail mail VARCHAR(255) NOT NULL, CHANGE tel tel INT DEFAULT NULL
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE UNIQUE INDEX cin ON user (cin)
+            CREATE INDEX cin ON user (cin)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE vol CHANGE compagnie compagnie VARCHAR(100) NOT NULL, CHANGE aeroport_depart aeroport_depart VARCHAR(100) NOT NULL, CHANGE aeroport_arrivee aeroport_arrivee VARCHAR(100) NOT NULL, CHANGE destination destination VARCHAR(100) NOT NULL
+            ALTER TABLE vol CHANGE compagnie compagnie VARCHAR(255) DEFAULT NULL, CHANGE aeroport_depart aeroport_depart VARCHAR(255) DEFAULT NULL, CHANGE aeroport_arrivee aeroport_arrivee VARCHAR(255) DEFAULT NULL, CHANGE destination destination VARCHAR(255) DEFAULT NULL
         SQL);
     }
 }

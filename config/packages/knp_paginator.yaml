@@ -1,0 +1,13 @@
+knp_paginator:
+    page_range: 5                      # Number of pages shown in the pagination menu
+    default_options:
+        page_name: page                # Page parameter name
+        sort_field_name: sort          # Sort field parameter name
+        sort_direction_name: direction # Sort direction parameter name
+        distinct: true                 # Ensure distinct results, useful when using GROUP BY
+        filter_field_name: filterField # Filter field name parameter name
+        filter_value_name: filterValue # Filter value parameter name
+    template:
+        pagination: '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig'     # Sliding pagination controls template
+        sortable: '@KnpPaginator/Pagination/sortable_link.html.twig' # Sort link template
+        filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # Filters template 

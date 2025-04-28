@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
 
 #[Route('/admin')] // Prefix all routes in this controller with /admin
 #[IsGranted('ROLE_ADMIN')] // Ensure only admins can access any route here
@@ -37,13 +38,59 @@ class AdminController extends AbstractController
     }
 
     #[Route('/users', name: 'admin_user_index')]
-    public function userIndex(UserRepository $userRepository): Response
+    public function userIndex(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
     {
-        // Fetch all users (you might want pagination for many users)
-        $users = $userRepository->findAll(); 
+        $page = $request->query->getInt('page', 1);
+        $searchQuery = $request->query->get('search');
+        $roleFilter = $request->query->get('role');
+        $verifiedFilter = $request->query->get('verified');
+
+        // Create query builder for users
+        $qb = $userRepository->createQueryBuilder('u');
+
+        // Apply search
+        if ($searchQuery) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('u.nom', ':query'),
+                    $qb->expr()->like('u.prenom', ':query'),
+                    $qb->expr()->like('u.mail', ':query'),
+                    $qb->expr()->like('u.cin', ':query')
+                )
+            )
+            ->setParameter('query', '%' . $searchQuery . '%');
+        }
+
+        // Apply role filter
+        if ($roleFilter === 'ROLE_ADMIN') {
+            $qb->andWhere('u.roles LIKE :role')
+               ->setParameter('role', '%ROLE_ADMIN%');
+        } elseif ($roleFilter === 'ROLE_USER') {
+            $qb->andWhere('u.roles NOT LIKE :role')
+               ->setParameter('role', '%ROLE_ADMIN%');
+        }
+
+        // Apply verification filter
+        if ($verifiedFilter !== null && $verifiedFilter !== '') {
+            $qb->andWhere('u.isVerified = :verified')
+               ->setParameter('verified', (bool)$verifiedFilter);
+        }
+
+        // Order by name
+        $qb->orderBy('u.nom', 'ASC');
+
+        // Paginate the results
+        $pagination = $paginator->paginate(
+            $qb,
+            $page,
+            10 // Items per page
+        );
 
         return $this->render('admin/user/index.html.twig', [
-            'users' => $users,
+            'pagination' => $pagination,
+            'searchQuery' => $searchQuery,
+            'roleFilter' => $roleFilter,
+            'verifiedFilter' => $verifiedFilter,
         ]);
     }
 
