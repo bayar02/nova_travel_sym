@@ -1,0 +1,55 @@
+{% extends 'baseFront.html.twig' %}
+    {% block body %}
+
+    <section id="portfolio-details" class="portfolio-details section">
+
+      <div class="container" data-aos="fade-up">
+
+        <div class="portfolio-details-slider swiper init-swiper">
+          <div class="swiper-wrapper align-items-center">
+
+            <div class="swiper-slide">
+              <img src="{{ asset('uploads/' ~ hebergement.photo) }}" alt="">
+            </div>
+
+          </div>
+        </div>
+
+        <div class="row justify-content-between gy-4 mt-4">
+
+          <div class="col-lg-8" data-aos="fade-up">
+            <div class="portfolio-description">
+              <h2>{{ hebergement.type }} | {{ hebergement.prixNuit }}</h2>
+              <p>
+                {{ hebergement.description }}
+              </p>
+
+              <p>
+                <strong>Nom:</strong> {{ hebergement.nom }}
+                {{ hebergement.adresse }}
+              </p>
+
+            </div>
+          </div>
+
+          <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="portfolio-info">
+              <h3>Reserveration</h3>
+              <ul>
+
+                <li>
+                <li>
+                    <a href="{{ path('reservationH', { id: hebergement.id }) }}" class="btn-visit align-self-start">Reserver</a>
+                    </li>   
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Portfolio Details Section -->
+    
+    {% endblock %}

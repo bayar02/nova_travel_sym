@@ -1,0 +1,167 @@
+{{ form_start(form) }}
+
+<div class="form-group">
+    {{ form_label(form.date_reclamation) }}
+    {{ form_widget(form.date_reclamation) }}
+    <div style="color: red;">{{ form_errors(form.date_reclamation) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.type) }}
+    {{ form_widget(form.type) }}
+    <div style="color: red;">{{ form_errors(form.type) }}</div>
+</div>
+
+<div class="form-group">
+    {{ form_label(form.message) }}
+    <div class="emoji-container">
+        <button type="button" onclick="show_emoji()" class="emojiButton">😊</button>
+        {{ form_widget(form.message) }}
+        <div class="emoji-picker">
+            <span id="emoji1" onclick="emoji(this.id)">&#128512;</span>
+            <span id="emoji2" onclick="emoji(this.id)">&#128513;</span>
+            <span id="emoji3" onclick="emoji(this.id)">&#128514;</span>
+            <span id="emoji4" onclick="emoji(this.id)">&#128515;</span>
+            <span id="emoji5" onclick="emoji(this.id)">&#128516;</span>
+            <span id="emoji6" onclick="emoji(this.id)">&#128517;</span>
+            <span id="emoji7" onclick="emoji(this.id)">&#128518;</span>
+            <span id="emoji8" onclick="emoji(this.id)">&#128519;</span>
+            <span id="emoji9" onclick="emoji(this.id)">&#128520;</span>
+            <span id="emoji10" onclick="emoji(this.id)">&#128521;</span>
+            <span id="emoji11" onclick="emoji(this.id)">&#128522;</span>
+            <span id="emoji12" onclick="emoji(this.id)">&#128523;</span>
+            <span id="emoji13" onclick="emoji(this.id)">&#128524;</span>
+            <span id="emoji14" onclick="emoji(this.id)">&#128525;</span>
+            <span id="emoji15" onclick="emoji(this.id)">&#128526;</span>
+            <span id="emoji16" onclick="emoji(this.id)">&#128527;</span>
+            <span id="emoji17" onclick="emoji(this.id)">&#128528;</span>
+            <span id="emoji18" onclick="emoji(this.id)">&#128529;</span>
+            <span id="emoji19" onclick="emoji(this.id)">&#128530;</span>
+            <span id="emoji20" onclick="emoji(this.id)">&#128531;</span>
+            <span id="emoji21" onclick="emoji(this.id)">&#128532;</span>
+            <span id="emoji22" onclick="emoji(this.id)">&#128533;</span>
+            <span id="emoji23" onclick="emoji(this.id)">&#128534;</span>
+            <span id="emoji24" onclick="emoji(this.id)">&#128535;</span>
+            <span id="emoji25" onclick="emoji(this.id)">&#128536;</span>
+            <span id="emoji26" onclick="emoji(this.id)">&#128537;</span>
+            <span id="emoji27" onclick="emoji(this.id)">&#128538;</span>
+            <span id="emoji28" onclick="emoji(this.id)">&#128539;</span>
+            <span id="emoji29" onclick="emoji(this.id)">&#128540;</span>
+            <span id="emoji30" onclick="emoji(this.id)">&#128541;</span>
+            <span id="emoji31" onclick="emoji(this.id)">&#128542;</span>
+            <span id="emoji32" onclick="emoji(this.id)">&#128543;</span>
+        </div>
+    </div>
+    <div style="color: red;">{{ form_errors(form.message) }}</div>
+</div>
+
+<button class="btn">{{ button_label|default('Enregistrer') }}</button>
+
+{{ form_end(form) }}
+
+<style>
+    .emojiButton {
+        height: 20px;
+        width: 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 20px;
+        margin-right: 10px;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+        vertical-align: middle;
+    }
+    
+    .emojiButton:hover {
+        background-color: #eee;
+    }
+    
+    .emoji-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .emoji-picker {
+        position: absolute;
+        left: 0;
+        top: 100%;
+        height: 0;
+        width: 300px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        overflow-y: scroll;
+        cursor: pointer;
+        transition: height 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+    }
+    
+    .emoji-picker.active {
+        height: 150px;
+        padding: 8px;
+    }
+    
+    .emoji-picker span {
+        font-size: 24px;
+        margin: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .emoji-picker span:hover {
+        transform: scale(1.2);
+    }
+    
+    .emoji-picker::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .emoji-picker::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 5px;
+    }
+</style>
+
+<script>
+    function show_emoji() {
+        const picker = document.querySelector('.emoji-picker');
+        picker.classList.toggle('active');
+    }
+    
+    function emoji(emojiId) {
+        // Get the emoji character from the clicked span
+        const emojiCharacter = document.getElementById(emojiId).innerHTML;
+        // Get the message input field element
+        const messageInput = document.getElementById('{{ form.message.vars.id }}');
+
+        // Insert at cursor position
+        const startPos = messageInput.selectionStart;
+        const endPos = messageInput.selectionEnd;
+        messageInput.value = messageInput.value.substring(0, startPos) + emojiCharacter + messageInput.value.substring(endPos);
+        
+        // Set cursor position after the inserted emoji
+        messageInput.selectionStart = startPos + emojiCharacter.length;
+        messageInput.selectionEnd = startPos + emojiCharacter.length;
+        
+        // Focus back on the input field
+        messageInput.focus();
+        
+        // Close the picker
+        document.querySelector('.emoji-picker').classList.remove('active');
+    }
+    
+    // Close emoji picker when clicking outside
+    document.addEventListener('click', function(event) {
+        const picker = document.querySelector('.emoji-picker');
+        const button = document.querySelector('.emojiButton');
+        
+        if (!picker.contains(event.target) && event.target !== button) {
+            picker.classList.remove('active');
+        }
+    });
+</script>

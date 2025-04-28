@@ -1,0 +1,47 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block body %}
+<section id="contact" class="contact section">
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Add Reserveration</h2>
+  </div><!-- End Section Title -->
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row gx-lg-0 gy-4">
+      <div class="col-lg-8">
+      {{ form_start(form) }}
+        <div class="row gy-4">
+
+          <div class="col-md-12">
+            {{ form_label(form.date_debut) }}
+            {{ form_widget(form.date_debut, {'attr': {'class': 'form-control', 'placeholder': 'date_debut'}}) }}
+            <div class="text-danger">{{ form_errors(form.date_debut) }}</div>
+          </div>
+
+          <div class="col-md-12">
+            {{ form_label(form.date_fin) }}
+            {{ form_widget(form.date_fin, {'attr': {'class': 'form-control', 'placeholder': 'date_fin', 'rows': '8'}}) }}
+            <div class="text-danger">{{ form_errors(form.date_fin) }}</div>
+          </div>
+
+          <div class="col-md-12">
+            {{ form_label(form.nb_perso) }}
+            {{ form_widget(form.nb_perso, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">{{ form_errors(form.nb_perso) }}</div>
+          </div>
+
+          <div class="col-md-12 text-center">
+            <div class="loading">Loading</div>
+            <div class="error-message"></div>
+            <div class="sent-message">Your message has been sent. Thank you!</div>
+
+            <button type="submit">Send Message</button>
+          </div>
+        </div>
+        {{ form_end(form) }}
+      </div><!-- End Contact Form -->
+    </div>
+  </div>
+</section><!-- /Contact Section -->
+{% endblock %}
