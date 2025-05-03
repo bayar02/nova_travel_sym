@@ -1,0 +1,4 @@
+admin_currency_modal:
+    path: /admin/currency/modal
+    controller: App\Controller\AdminController::currencyModal
+    methods: [GET]

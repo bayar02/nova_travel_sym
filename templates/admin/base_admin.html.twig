@@ -115,7 +115,11 @@
         .flash-warning { background-color: #ffc107; color: #333;}
         .flash-info { background-color: #17a2b8; }
     </style>
-    {% block admin_stylesheets %}{% endblock %}
+    {% block admin_stylesheets %}
+        <!-- Custom styles for admin -->
+        <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.min.css" rel="stylesheet">
+    {% endblock %}
 {% endblock %}
 
 {% block body %}
@@ -186,5 +190,8 @@
     {{ parent() }} 
     {# Global admin_sidebar.js is loaded via app.js -> importmap('app') #}
     {# Add any JS specific to the overall admin layout here #}
-    {% block admin_javascripts %}{% endblock %}
+    {% block admin_javascripts %}
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.min.js"></script>
+    {% endblock %}
 {% endblock %} 

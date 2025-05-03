@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/vol')]
-final class VolController extends AbstractController
+class VolController extends AbstractController
 {
     #[Route(name: 'app_vol_index', methods: ['GET'])]
     public function index(VolRepository $volRepository): Response
@@ -274,5 +274,115 @@ final class VolController extends AbstractController
             // Return error response
             return $this->json(['success' => false, 'message' => 'An error occurred while updating the flight'], 500);
         }
+    }
+
+    #[Route('/search/ajax', name: 'app_vol_search_ajax', methods: ['GET'])]
+    public function searchAjax(Request $request, VolRepository $volRepository): Response
+    {
+        // Get search parameters
+        $destination = $request->query->get('destination');
+        $aeroportArrivee = $request->query->get('aeroport_arrivee');
+        $dateStart = $request->query->get('dateStart');
+        $dateEnd = $request->query->get('dateEnd');
+        $sortBy = $request->query->get('sortBy', 'date');
+
+        // Build search criteria
+        $criteria = array_filter([
+            'destination' => $destination,
+            'aeroport_arrivee' => $aeroportArrivee,
+            'dateStart' => $dateStart,
+            'dateEnd' => $dateEnd,
+        ]);
+
+        // Get results
+        $flights = $volRepository->searchFlights($criteria, $sortBy)
+            ->getQuery()
+            ->getResult();
+
+        // Format results for JSON response
+        $results = array_map(function($flight) {
+            return [
+                'id' => $flight->getId(),
+                'compagnie' => $flight->getCompagnie(),
+                'destination' => $flight->getDestination(),
+                'aeroportDepart' => $flight->getAeroportDepart(),
+                'aeroportArrivee' => $flight->getAeroportArrivee(),
+                'dateDepart' => $flight->getDateDepart()->format('Y-m-d H:i'),
+                'dateArrivee' => $flight->getDateArrivee()->format('Y-m-d H:i'),
+                'prix' => $flight->getPrix(),
+            ];
+        }, $flights);
+
+        return $this->json(['success' => true, 'flights' => $results]);
+    }
+
+    #[Route('/airports/autocomplete', name: 'app_vol_airports_autocomplete', methods: ['GET'])]
+    public function airportsAutocomplete(Request $request, VolRepository $volRepository): Response
+    {
+        $term = $request->query->get('term', '');
+        $type = $request->query->get('type', 'arrival');
+        
+        $airports = $volRepository->searchAirports($term, $type);
+        
+        $results = $type === 'destination' 
+            ? array_column($airports, 'destination')
+            : array_column($airports, 'aeroport_arrivee');
+        
+        return $this->json(['success' => true, 'airports' => $results]);
+    }
+
+    #[Route('/admin/calendar', name: 'admin_calendar', methods: ['GET'])]
+    public function calendar(): Response
+    {
+        return $this->render('admin/calendar.html.twig');
+    }
+
+    #[Route('/admin/calendar/events', name: 'admin_calendar_events', methods: ['GET'])]
+    public function getCalendarEvents(Request $request, VolRepository $volRepository): Response
+    {
+        $start = new \DateTime($request->query->get('start'));
+        $end = new \DateTime($request->query->get('end'));
+        
+        $flights = $volRepository->findFlightsBetweenDates($start, $end);
+        
+        return $this->json($flights);
+    }
+
+    #[Route('/admin/new/modal', name: 'admin_vol_new_modal', methods: ['GET'])]
+    public function newModal(): Response
+    {
+        return $this->render('admin/vol/_form_modal.html.twig', [
+            'action' => $this->generateUrl('app_vol_new_ajax')
+        ]);
+    }
+
+    #[Route('/admin/{id}/edit/modal', name: 'admin_vol_edit_modal', methods: ['GET'])]
+    public function editModal(Vol $vol): Response
+    {
+        return $this->render('admin/vol/_form_modal.html.twig', [
+            'vol' => $vol,
+            'action' => $this->generateUrl('app_vol_edit_ajax', ['id' => $vol->getId()])
+        ]);
+    }
+
+    #[Route('/admin/{id}/delete/confirm', name: 'admin_vol_delete_confirm', methods: ['GET'])]
+    public function deleteConfirm(Vol $vol): Response
+    {
+        return $this->render('admin/vol/_delete_confirm.html.twig', [
+            'vol' => $vol
+        ]);
+    }
+
+    #[Route('/admin/list', name: 'admin_vol_list', methods: ['GET'])]
+    public function list(Request $request, VolRepository $volRepository): Response
+    {
+        $page = $request->query->getInt('page', 1);
+        $limit = $request->query->getInt('limit', 10);
+        
+        $flights = $volRepository->findBy([], ['date_depart' => 'DESC']);
+        
+        return $this->render('admin/vol/_list.html.twig', [
+            'flights' => $flights
+        ]);
     }
 }

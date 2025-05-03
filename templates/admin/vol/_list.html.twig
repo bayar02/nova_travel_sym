@@ -1,0 +1,55 @@
+{% if flights is defined and flights|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                    <tr>
+                        <td>{{ flight.compagnie }}</td>
+                        <td>{{ flight.aeroportDepart }}</td>
+                        <td>{{ flight.aeroportArrivee }}</td>
+                        <td>{{ flight.dateDepart|date('Y-m-d H:i') }}</td>
+                        <td>{{ flight.dateArrivee|date('Y-m-d H:i') }}</td>
+                        <td>{{ flight.prix }}€</td>
+                        <td>
+                            {% if flight.dateDepart > date() %}
+                                <span class="badge bg-success">Upcoming</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Past</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ path('admin_vol_edit', {'id': flight.id}) }}" 
+                                   class="btn btn-sm btn-primary edit-flight" 
+                                   data-id="{{ flight.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ path('admin_vol_delete', {'id': flight.id}) }}" 
+                                   class="btn btn-sm btn-danger delete-flight" 
+                                   data-id="{{ flight.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        No flights found.
+    </div>
+{% endif %} 

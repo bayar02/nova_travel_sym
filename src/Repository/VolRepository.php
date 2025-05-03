@@ -38,11 +38,11 @@ class VolRepository extends ServiceEntityRepository
     /**
      * Search flights by criteria
      * 
-     * @param array $criteria Search criteria (destination, dateStart, dateEnd)
+     * @param array $criteria Search criteria (destination, dateStart, dateEnd, aeroport_arrivee)
      * @param string $sortBy Field to sort by (date, price_asc, price_desc)
-     * @return Vol[] Returns an array of matching Vol objects
+     * @return \Doctrine\ORM\QueryBuilder Returns a query builder for pagination
      */
-    public function searchFlights(array $criteria, string $sortBy = 'date'): array
+    public function searchFlights(array $criteria, string $sortBy = 'date'): \Doctrine\ORM\QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('v');
         
@@ -55,29 +55,29 @@ class VolRepository extends ServiceEntityRepository
                 ->andWhere('LOWER(v.destination) LIKE LOWER(:destination)')
                 ->setParameter('destination', '%' . $criteria['destination'] . '%');
         }
+
+        // Filter by arrival airport if specified
+        if (!empty($criteria['aeroport_arrivee'])) {
+            $queryBuilder
+                ->andWhere('LOWER(v.aeroport_arrivee) LIKE LOWER(:aeroport_arrivee)')
+                ->setParameter('aeroport_arrivee', '%' . $criteria['aeroport_arrivee'] . '%');
+        }
         
         // Filter by date range if specified
-        if (!empty($criteria['dateStart']) && !empty($criteria['dateEnd'])) {
-            $startDate = new \DateTime($criteria['dateStart']);
-            $endDate = new \DateTime($criteria['dateEnd']);
+        if (!empty($criteria['dateStart']) || !empty($criteria['dateEnd'])) {
+            if (!empty($criteria['dateStart'])) {
+                $startDate = new \DateTime($criteria['dateStart']);
+                $queryBuilder
+                    ->andWhere('v.date_depart >= :startDate')
+                    ->setParameter('startDate', $startDate);
+            }
             
-            $queryBuilder
-                ->andWhere(
-                    $queryBuilder->expr()->orX(
-                        // Departure date within range
-                        $queryBuilder->expr()->andX(
-                            $queryBuilder->expr()->gte('v.date_depart', ':startDate'),
-                            $queryBuilder->expr()->lte('v.date_depart', ':endDate')
-                        ),
-                        // Arrival date within range
-                        $queryBuilder->expr()->andX(
-                            $queryBuilder->expr()->gte('v.date_arrivee', ':startDate'),
-                            $queryBuilder->expr()->lte('v.date_arrivee', ':endDate')
-                        )
-                    )
-                )
-                ->setParameter('startDate', $startDate)
-                ->setParameter('endDate', $endDate);
+            if (!empty($criteria['dateEnd'])) {
+                $endDate = new \DateTime($criteria['dateEnd']);
+                $queryBuilder
+                    ->andWhere('v.date_depart <= :endDate')
+                    ->setParameter('endDate', $endDate);
+            }
         }
         
         // Apply sorting
@@ -94,7 +94,48 @@ class VolRepository extends ServiceEntityRepository
                 break;
         }
         
-        return $queryBuilder
+        return $queryBuilder;
+    }
+
+    /**
+     * Search airports for autocomplete
+     * 
+     * @param string $term Search term
+     * @param string $type Type of search ('destination' or 'arrival')
+     * @return array Returns matching airports
+     */
+    public function searchAirports(string $term, string $type = 'arrival'): array
+    {
+        $qb = $this->createQueryBuilder('v');
+        
+        if ($type === 'destination') {
+            $qb->select('DISTINCT v.destination')
+               ->where('LOWER(v.destination) LIKE LOWER(:term)')
+               ->setParameter('term', '%' . $term . '%');
+        } else {
+            $qb->select('DISTINCT v.aeroport_arrivee')
+               ->where('LOWER(v.aeroport_arrivee) LIKE LOWER(:term)')
+               ->setParameter('term', '%' . $term . '%');
+        }
+        
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Find flights between two dates for calendar display
+     * 
+     * @param \DateTime $start Start date
+     * @param \DateTime $end End date
+     * @return Vol[] Returns an array of Vol objects
+     */
+    public function findFlightsBetweenDates(\DateTime $start, \DateTime $end): array
+    {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.date_depart >= :start')
+            ->andWhere('v.date_depart <= :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('v.date_depart', 'ASC')
             ->getQuery()
             ->getResult();
     }

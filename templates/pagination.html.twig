@@ -1,0 +1,60 @@
+{% if knp_pagination.haveToPaginate %}
+    <nav aria-label="Page navigation" class="pagination-nav">
+        <ul class="pagination mb-0">
+            {% if knp_pagination.hasPreviousPage %}
+                <li class="page-item">
+                    <a class="page-link border-0 px-3" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': knp_pagination.previousPage})) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link border-0 px-3" aria-hidden="true">&laquo;</span>
+                </li>
+            {% endif %}
+
+            {% for i in 1..knp_pagination.nbPages %}
+                <li class="page-item {% if i == knp_pagination.currentPage %}active{% endif %}">
+                    <a class="page-link border-0 px-3" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': i})) }}">{{ i }}</a>
+                </li>
+            {% endfor %}
+
+            {% if knp_pagination.hasNextPage %}
+                <li class="page-item">
+                    <a class="page-link border-0 px-3" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': knp_pagination.nextPage})) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link border-0 px-3" aria-hidden="true">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <style>
+        .pagination-nav .page-link {
+            color: #4e73df;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            margin: 0 2px;
+        }
+        
+        .pagination-nav .page-link:hover {
+            background-color: #eaecf4;
+            color: #2e59d9;
+        }
+        
+        .pagination-nav .page-item.active .page-link {
+            background-color: #4e73df;
+            color: white;
+        }
+        
+        .pagination-nav .page-item.disabled .page-link {
+            color: #858796;
+            background-color: transparent;
+        }
+    </style>
+{% endif %} 
