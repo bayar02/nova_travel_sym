@@ -5,7 +5,6 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         #admin-sidebar {
@@ -85,6 +84,76 @@
             padding-left: 275px;
         }
 
+        /* Table styles */
+        .flights-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .flights-table th {
+            background-color: #4e73df;
+            color: white;
+            font-weight: 500;
+            padding: 15px;
+        }
+
+        .flights-table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .flights-table tbody tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        .action-buttons .btn {
+            margin: 0 5px;
+        }
+
+        /* Search box styles */
+        .search-box {
+            background-color: #003b95;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-box h3 {
+            color: white;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .search-box .form-control {
+            border-radius: 4px;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        .search-box .btn-primary {
+            background-color: #0071c2;
+            border-color: #0071c2;
+            height: 50px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .search-box .btn-primary:hover {
+            background-color: #005999;
+        }
+
+        .filter-bar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
         /* Modal styles */
         .modal-overlay {
             position: fixed;
@@ -159,123 +228,307 @@
         .modal-body {
             padding: 30px;
         }
-
-        .swiper {
-            width: 100%;
-            padding: 30px 0;
-        }
-
-        .swiper-slide {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            width: 300px;
-            height: 350px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .flight-card {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .flight-card h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #4e73df;
-        }
-
-        .flight-info {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .flight-details {
-            margin-bottom: 15px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: auto;
-        }
-
-        /* Search box styles */
-        .search-box {
-            background-color: #003b95;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .search-box h3 {
-            color: white;
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-
-        .search-box .form-control {
-            border-radius: 4px;
-            height: 50px;
-            font-size: 16px;
-        }
-
-        .search-box .btn-primary {
-            background-color: #0071c2;
-            border-color: #0071c2;
-            height: 50px;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .search-box .btn-primary:hover {
-            background-color: #005999;
-        }
-
-        .filter-bar {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .search-results-title {
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 20px;
-        }
     </style>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButton = document.getElementById('admin-sidebar-toggle-btn');
+            const sidebar = document.getElementById('admin-sidebar');
+
+            function toggleAdminSidebar(e) {
+                e.preventDefault();
+                if (sidebar && toggleButton) {
+                    sidebar.classList.toggle('close');
+                    toggleButton.classList.toggle('rotate');
+                }
+            }
+
+            if (toggleButton) {
+                toggleButton.addEventListener('click', toggleAdminSidebar);
+            }
+
+            // Store sidebar state in localStorage
+            if (sidebar) {
+                const sidebarState = localStorage.getItem('userSidebarState');
+                if (sidebarState === 'closed') {
+                    sidebar.classList.add('close');
+                    toggleButton?.classList.add('rotate');
+                }
+
+                // Update localStorage when sidebar state changes
+                const observer = new MutationObserver(() => {
+                    localStorage.setItem('userSidebarState', 
+                        sidebar.classList.contains('close') ? 'closed' : 'open'
+                    );
+                });
+
+                observer.observe(sidebar, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            }
+
+            // Initialize date pickers
+            flatpickr(".date-picker", {
+                dateFormat: "Y-m-d",
+                minDate: "today"
+            });
+
+            // Modal functionality
+            const flightModal = document.getElementById('flightDetailsModal');
+            const closeFlightModal = document.getElementById('closeFlightModal');
+            const bookingModal = document.getElementById('flightBookingModal');
+            const closeBookingModal = document.getElementById('closeBookingModal');
+
+            if (closeFlightModal && flightModal) {
+                closeFlightModal.addEventListener('click', function() {
+                    flightModal.classList.remove('active');
+                });
+
+                flightModal.addEventListener('click', function(e) {
+                    if (e.target === flightModal) {
+                        flightModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (closeBookingModal && bookingModal) {
+                closeBookingModal.addEventListener('click', function() {
+                    bookingModal.classList.remove('active');
+                });
+
+                bookingModal.addEventListener('click', function(e) {
+                    if (e.target === bookingModal) {
+                        bookingModal.classList.remove('active');
+                    }
+                });
+            }
+
+            // Initialize autocomplete for destination
+            $("#destination").autocomplete({
+                source: function(request, response) {
+                    $.get("{{ path('app_vol_airports_autocomplete') }}", {
+                        term: request.term,
+                        type: 'destination'
+                    }, function(data) {
+                        response(data.airports);
+                    });
+                },
+                minLength: 2,
+                change: function(event, ui) {
+                    performSearch();
+                }
+            });
+
+            // Initialize autocomplete for arrival airport
+            $("#aeroport_arrivee").autocomplete({
+                source: function(request, response) {
+                    $.get("{{ path('app_vol_airports_autocomplete') }}", {
+                        term: request.term,
+                        type: 'arrival'
+                    }, function(data) {
+                        response(data.airports);
+                    });
+                },
+                minLength: 2,
+                change: function(event, ui) {
+                    performSearch();
+                }
+            });
+
+            // Live search function with proper table structure
+            let searchTimeout;
+            function performSearch() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchData = {
+                        destination: $("#destination").val(),
+                        aeroport_arrivee: $("#aeroport_arrivee").val(),
+                        dateStart: $("#dateStart").val(),
+                        dateEnd: $("#dateEnd").val(),
+                        sortBy: $("#sortBy").val()
+                    };
+
+                    $.get("{{ path('app_vol_search_ajax') }}", searchData, function(response) {
+                        if (response.success) {
+                            updateFlightsTable(response.flights);
+                        }
+                    });
+                }, 300);
+            }
+
+            // Update flights table with search results
+            function updateFlightsTable(flights) {
+                const tableContainer = $(".flights-table");
+                
+                if (flights.length === 0) {
+                    tableContainer.html('<div class="alert alert-info m-3">No flights found. Try different search criteria.</div>');
+                    return;
+                }
+
+                // Create table structure if it doesn't exist
+                let table = `
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Airline</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Departure</th>
+                                <th>Arrival</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // Add rows
+                flights.forEach(flight => {
+                    table += `
+                        <tr>
+                            <td>${flight.compagnie}</td>
+                            <td>${flight.aeroportDepart}</td>
+                            <td>${flight.aeroportArrivee}</td>
+                            <td>${flight.dateDepart}</td>
+                            <td>${flight.dateArrivee}</td>
+                            <td>${flight.prix} €</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-sm btn-info" onclick="showFlightDetails(${flight.id}, '${flight.compagnie}', '${flight.destination}', '${flight.aeroportDepart}', '${flight.aeroportArrivee}', '${flight.dateDepart}', '${flight.dateArrivee}', ${flight.prix})">
+                                    Details
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="showBookingForm(${flight.id}, '${flight.compagnie}', '${flight.destination}', '${flight.aeroportDepart}', '${flight.aeroportArrivee}', '${flight.dateDepart}', '${flight.dateArrivee}', ${flight.prix})">
+                                    Book
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                table += '</tbody></table>';
+                tableContainer.html(table);
+
+                // Update search results count
+                $(".search-results-title").text(`${flights.length} flights found`);
+            }
+
+            // Attach event listeners for live search
+            $("#destination, #aeroport_arrivee").on('keyup', function() {
+                if ($(this).val().length >= 2) {
+                    performSearch();
+                }
+            });
+
+            $("#dateStart, #dateEnd, #sortBy").on('change', performSearch);
+
+            // Initial search on page load
+            performSearch();
+        });
+
+        // Current flight ID for booking
+        let currentFlightId = null;
+        let currentFlightPrice = 0;
+
+        // Function to show flight details
+        function showFlightDetails(id, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix) {
+            const modal = document.getElementById('flightDetailsModal');
+            currentFlightId = id;
+            currentFlightPrice = prix;
+            
+            document.getElementById('flightTitle').textContent = `${compagnie} - ${destination}`;
+            document.getElementById('flightFrom').textContent = aeroportDepart;
+            document.getElementById('flightTo').textContent = aeroportArrivee;
+            document.getElementById('flightDeparture').textContent = dateDepart;
+            document.getElementById('flightArrival').textContent = dateArrivee;
+            document.getElementById('flightPrice').textContent = prix;
+            
+            document.getElementById('bookFlightLink').href = "{{ path('app_reservation_vol_book', {'id': 'FLIGHT_ID'}) }}".replace('FLIGHT_ID', id);
+            
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+        
+        function showBookingFormFromDetails() {
+            document.getElementById('flightDetailsModal').classList.remove('active');
+            
+            const compagnie = document.getElementById('flightTitle').textContent.split(' - ')[0];
+            const destination = document.getElementById('flightTitle').textContent.split(' - ')[1];
+            const aeroportDepart = document.getElementById('flightFrom').textContent;
+            const aeroportArrivee = document.getElementById('flightTo').textContent;
+            const dateDepart = document.getElementById('flightDeparture').textContent;
+            const dateArrivee = document.getElementById('flightArrival').textContent;
+            const prix = parseFloat(document.getElementById('flightPrice').textContent);
+            
+            showBookingForm(currentFlightId, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix);
+        }
+        
+        function showBookingForm(id, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix) {
+            const modal = document.getElementById('flightBookingModal');
+            currentFlightId = id;
+            currentFlightPrice = prix;
+            
+            document.getElementById('bookingFlightTitle').textContent = `${compagnie} - ${destination}`;
+            document.getElementById('bookingFlightFrom').textContent = aeroportDepart;
+            document.getElementById('bookingFlightTo').textContent = aeroportArrivee;
+            document.getElementById('bookingFlightDeparture').textContent = dateDepart;
+            document.getElementById('bookingFlightArrival').textContent = dateArrivee;
+            
+            document.getElementById('bookingForm').action = "{{ path('app_reservation_vol_book', {'id': 'FLIGHT_ID'}) }}".replace('FLIGHT_ID', id);
+            
+            updateBookingPrice();
+            
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+        
+        function updateBookingPrice() {
+            const nbTickets = parseInt(document.getElementById('nb_billets').value);
+            const classType = document.getElementById('classe').value;
+            
+            let multiplier = 1;
+            switch(classType) {
+                case 'Business':
+                    multiplier = 1.5;
+                    break;
+                case 'First Class':
+                    multiplier = 2;
+                    break;
+                default:
+                    multiplier = 1;
+            }
+            
+            const classPrice = Math.round(currentFlightPrice * multiplier * 100) / 100;
+            const totalPrice = Math.round(classPrice * nbTickets * 100) / 100;
+            
+            document.getElementById('nb-tickets').textContent = nbTickets;
+            document.getElementById('class-name').textContent = classType;
+            document.getElementById('class-price').textContent = classPrice;
+            document.getElementById('total-price').textContent = totalPrice;
+        }
+    </script>
 {% endblock %}
 
 {% block body %}
-{# Sidebar HTML - Adapted from admin/dashboard.html.twig #}
-{# Note: Using the same IDs/Classes as admin sidebar for CSS/JS compatibility #}
-<nav id="admin-sidebar"> {# Keep ID for CSS/JS #}
+{# Sidebar HTML #}
+<nav id="admin-sidebar">
     <ul>
         <li>
-            {# Toggle Button #}
             <button id="admin-sidebar-toggle-btn" title="Toggle Sidebar">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                     <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
                 </svg>
             </button>
         </li>
-        {# User Dashboard Home Link #}
         <li class="{% if app.request.attributes.get('_route') == 'user_dashboard' %}active{% endif %}">
             <a href="{{ path('user_dashboard') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -284,8 +537,6 @@
                 <span>Home</span>
             </a>
         </li>
-
-        {# My Flights Link #}
         <li class="{% if app.request.attributes.get('_route') == 'app_user_flights' %}active{% endif %}">
             <a href="{{ path('app_user_flights') }}">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
@@ -295,8 +546,6 @@
                 <span>My Flights</span>
             </a>
         </li>
-
-        {# Logout Button #}
         <li class="logout-item">
             <a href="{{ path('app_logout') }}" class="btn btn-danger">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
@@ -317,12 +566,12 @@
         <!-- Search Box -->
         <div class="search-box">
             <h3>Search for Flights</h3>
-            <form method="post">
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="destination" class="form-label">Where to?</label>
-                        <input type="text" class="form-control" id="destination" name="destination" placeholder="Destination" value="{{ searchCriteria.destination }}">
+                <div class="col-md-3">
+                    <label for="destination" class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="destination" name="destination" placeholder="Enter destination" value="{{ searchCriteria.destination }}">
                     </div>
+
                     <div class="col-md-3">
                         <label for="dateStart" class="form-label">Start Date</label>
                         <input type="date" class="form-control date-picker" id="dateStart" name="dateStart" placeholder="Check-in" value="{{ searchCriteria.dateStart }}">
@@ -331,14 +580,9 @@
                         <label for="dateEnd" class="form-label">End Date</label>
                         <input type="date" class="form-control date-picker" id="dateEnd" name="dateEnd" placeholder="Check-out" value="{{ searchCriteria.dateEnd }}">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Search</button>
-                    </div>
                 </div>
-            </form>
         </div>
         
-        {% if searchPerformed %}
             <!-- Filter Bar -->
             <div class="filter-bar d-flex justify-content-between align-items-center">
                 <div class="search-results-title">
@@ -349,66 +593,61 @@
                     {% endif %}
                 </div>
                 <div class="filters">
-                    <form method="post" id="sortForm" class="d-flex align-items-center">
-                        <input type="hidden" name="destination" value="{{ searchCriteria.destination }}">
-                        <input type="hidden" name="dateStart" value="{{ searchCriteria.dateStart }}">
-                        <input type="hidden" name="dateEnd" value="{{ searchCriteria.dateEnd }}">
+                <div class="d-flex align-items-center">
                         <label for="sortBy" class="me-2">Sort by:</label>
-                        <select class="form-select" id="sortBy" name="sortBy" onchange="document.getElementById('sortForm').submit()">
+                    <select class="form-select" id="sortBy" name="sortBy">
                             <option value="date" {% if sortBy == 'date' %}selected{% endif %}>Date</option>
                             <option value="price_asc" {% if sortBy == 'price_asc' %}selected{% endif %}>Price (Low to High)</option>
                             <option value="price_desc" {% if sortBy == 'price_desc' %}selected{% endif %}>Price (High to Low)</option>
                         </select>
-                    </form>
                 </div>
             </div>
-        {% endif %}
+        </div>
         
-        <!-- Upcoming Flights Carousel Section -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2 class="mb-4">
-                    {% if searchPerformed %}
-                        Search Results
-                    {% else %}
-                        Upcoming Flights
-                    {% endif %}
-                </h2>
-                
+        <!-- Flights Table -->
+        <div class="flights-table">
                 {% if upcomingFlights is empty %}
-                    <div class="alert alert-info">No flights found. Try different search criteria.</div>
+                <div class="alert alert-info m-3">No flights found. Try different search criteria.</div>
                 {% else %}
-                    <div class="swiper flightsSwiper">
-                        <div class="swiper-wrapper">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Airline</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Departure</th>
+                            <th>Arrival</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                             {% for flight in upcomingFlights %}
-                                <div class="swiper-slide">
-                                    <div class="flight-card">
-                                        <h3>{{ flight.compagnie }} - {{ flight.destination }}</h3>
-                                        <div class="flight-info">
-                                            <div class="flight-details">
-                                                <p><strong>From:</strong> {{ flight.aeroportDepart }}</p>
-                                                <p><strong>To:</strong> {{ flight.aeroportArrivee }}</p>
-                                                <p><strong>Departure:</strong> {{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}</p>
-                                                <p><strong>Arrival:</strong> {{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}</p>
-                                                <p><strong>Price:</strong> {{ flight.prix }} €</p>
-                                            </div>
-                                            <div class="action-buttons">
+                            <tr>
+                                <td>{{ flight.compagnie }}</td>
+                                <td>{{ flight.aeroportDepart }}</td>
+                                <td>{{ flight.aeroportArrivee }}</td>
+                                <td>{{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}</td>
+                                <td>{{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}</td>
+                                <td>{{ flight.prix }} €</td>
+                                <td class="action-buttons">
                                                 <button class="btn btn-sm btn-info" onclick="showFlightDetails({{ flight.id }}, '{{ flight.compagnie }}', '{{ flight.destination }}', '{{ flight.aeroportDepart }}', '{{ flight.aeroportArrivee }}', '{{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}', '{{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}', {{ flight.prix }})">
                                                     Details
                                                 </button>
-                                                <button class="btn btn-sm btn-primary" onclick="showBookingForm({{ flight.id }}, '{{ flight.compagnie }}', '{{ flight.destination }}', '{{ flight.aeroportDepart }}', '{{ flight.aeroportArrivee }}', '{{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}', '{{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}', {{ flight.prix }})">Book Flight</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    <button class="btn btn-sm btn-primary" onclick="showBookingForm({{ flight.id }}, '{{ flight.compagnie }}', '{{ flight.destination }}', '{{ flight.aeroportDepart }}', '{{ flight.aeroportArrivee }}', '{{ flight.dateDepart ? flight.dateDepart|date('d M Y H:i') : '' }}', '{{ flight.dateArrivee ? flight.dateArrivee|date('d M Y H:i') : '' }}', {{ flight.prix }})">
+                                        Book
+                                    </button>
+                                </td>
+                            </tr>
                             {% endfor %}
-                        </div>
-                        <div class="swiper-pagination"></div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center py-4" style="background: #f8f9fc; border-top: 1px solid #e3e6f0;">
+                    {{ knp_pagination_render(upcomingFlights) }}
                     </div>
                 {% endif %}
-            </div>
         </div>
     </div>
 </div>
@@ -509,180 +748,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Initialize Swiper
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the flights carousel
-        const swiper = new Swiper('.flightsSwiper', {
-            slidesPerView: 1,
-            spaceBetween: 30,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                640: {
-                    slidesPerView: 2,
-                    spaceBetween: 20,
-                },
-                768: {
-                    slidesPerView: 3,
-                    spaceBetween: 20,
-                },
-                1024: {
-                    slidesPerView: 3,
-                    spaceBetween: 30,
-                },
-            },
-        });
-
-        // Sidebar toggle functionality
-        const sidebar = document.getElementById('admin-sidebar');
-        const toggleBtn = document.getElementById('admin-sidebar-toggle-btn');
-        
-        if (toggleBtn && sidebar) {
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('close');
-            });
-        }
-
-        // Modal functionality
-        const flightModal = document.getElementById('flightDetailsModal');
-        const closeFlightModal = document.getElementById('closeFlightModal');
-        const bookingModal = document.getElementById('flightBookingModal');
-        const closeBookingModal = document.getElementById('closeBookingModal');
-
-        if (closeFlightModal && flightModal) {
-            closeFlightModal.addEventListener('click', function() {
-                flightModal.classList.remove('active');
-            });
-
-            flightModal.addEventListener('click', function(e) {
-                if (e.target === flightModal) {
-                    flightModal.classList.remove('active');
-                }
-            });
-        }
-        
-        if (closeBookingModal && bookingModal) {
-            closeBookingModal.addEventListener('click', function() {
-                bookingModal.classList.remove('active');
-            });
-
-            bookingModal.addEventListener('click', function(e) {
-                if (e.target === bookingModal) {
-                    bookingModal.classList.remove('active');
-                }
-            });
-        }
-        
-        // Initialize date pickers
-        flatpickr(".date-picker", {
-            dateFormat: "Y-m-d",
-            minDate: "today"
-        });
-    });
-
-    // Current flight ID for booking
-    let currentFlightId = null;
-    let currentFlightPrice = 0;
-
-    // Function to show flight details
-    function showFlightDetails(id, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix) {
-        const modal = document.getElementById('flightDetailsModal');
-        currentFlightId = id;
-        currentFlightPrice = prix;
-        
-        // Fill in the flight details
-        document.getElementById('flightTitle').textContent = `${compagnie} - ${destination}`;
-        document.getElementById('flightFrom').textContent = aeroportDepart;
-        document.getElementById('flightTo').textContent = aeroportArrivee;
-        document.getElementById('flightDeparture').textContent = dateDepart;
-        document.getElementById('flightArrival').textContent = dateArrivee;
-        document.getElementById('flightPrice').textContent = prix;
-        
-        // Update the booking link with the correct flight ID
-        document.getElementById('bookFlightLink').href = "{{ path('app_reservation_vol_book', {'id': 'FLIGHT_ID'}) }}".replace('FLIGHT_ID', id);
-        
-        // Show the modal
-        if (modal) {
-            modal.classList.add('active');
-        }
-    }
-    
-    // Function to show booking form from details modal
-    function showBookingFormFromDetails() {
-        // Hide details modal
-        document.getElementById('flightDetailsModal').classList.remove('active');
-        
-        // Get flight details from details modal
-        const compagnie = document.getElementById('flightTitle').textContent.split(' - ')[0];
-        const destination = document.getElementById('flightTitle').textContent.split(' - ')[1];
-        const aeroportDepart = document.getElementById('flightFrom').textContent;
-        const aeroportArrivee = document.getElementById('flightTo').textContent;
-        const dateDepart = document.getElementById('flightDeparture').textContent;
-        const dateArrivee = document.getElementById('flightArrival').textContent;
-        const prix = parseFloat(document.getElementById('flightPrice').textContent);
-        
-        // Show booking form
-        showBookingForm(currentFlightId, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix);
-    }
-    
-    // Function to show booking form
-    function showBookingForm(id, compagnie, destination, aeroportDepart, aeroportArrivee, dateDepart, dateArrivee, prix) {
-        const modal = document.getElementById('flightBookingModal');
-        currentFlightId = id;
-        currentFlightPrice = prix;
-        
-        // Fill in the flight details
-        document.getElementById('bookingFlightTitle').textContent = `${compagnie} - ${destination}`;
-        document.getElementById('bookingFlightFrom').textContent = aeroportDepart;
-        document.getElementById('bookingFlightTo').textContent = aeroportArrivee;
-        document.getElementById('bookingFlightDeparture').textContent = dateDepart;
-        document.getElementById('bookingFlightArrival').textContent = dateArrivee;
-        
-        // Set form action
-        document.getElementById('bookingForm').action = "{{ path('app_reservation_vol_book', {'id': 'FLIGHT_ID'}) }}".replace('FLIGHT_ID', id);
-        
-        // Initialize price
-        updateBookingPrice();
-        
-        // Show the modal
-        if (modal) {
-            modal.classList.add('active');
-        }
-    }
-    
-    // Function to update booking price
-    function updateBookingPrice() {
-        const nbTickets = parseInt(document.getElementById('nb_billets').value);
-        const classType = document.getElementById('classe').value;
-        
-        let multiplier = 1;
-        switch(classType) {
-            case 'Business':
-                multiplier = 1.5;
-                break;
-            case 'First Class':
-                multiplier = 2;
-                break;
-            default: // Economy
-                multiplier = 1;
-        }
-        
-        const classPrice = Math.round(currentFlightPrice * multiplier * 100) / 100;
-        const totalPrice = Math.round(classPrice * nbTickets * 100) / 100;
-        
-        document.getElementById('nb-tickets').textContent = nbTickets;
-        document.getElementById('class-name').textContent = classType;
-        document.getElementById('class-price').textContent = classPrice;
-        document.getElementById('total-price').textContent = totalPrice;
-    }
-</script>
-
 {% endblock %} 

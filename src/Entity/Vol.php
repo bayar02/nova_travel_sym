@@ -6,12 +6,15 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Calendar\Calendar;
+use CalendarBundle\Entity\Event;
+use CalendarBundle\Event\CalendarEvent;
 
 use App\Repository\VolRepository;
 
 #[ORM\Entity(repositoryClass: VolRepository::class)]
 #[ORM\Table(name: 'vol')]
-class Vol
+class Vol implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -208,4 +211,42 @@ class Vol
         return $this;
     }
 
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->compagnie . ' - ' . $this->destination,
+            'start' => $this->date_depart->format('Y-m-d H:i:s'),
+            'end' => $this->date_arrivee->format('Y-m-d H:i:s'),
+            'description' => sprintf(
+                'From: %s\nTo: %s\nPrice: %s€',
+                $this->aeroport_depart,
+                $this->aeroport_arrivee,
+                $this->prix
+            ),
+            'backgroundColor' => '#4e73df',
+            'borderColor' => '#4e73df',
+            'textColor' => '#fff',
+            'url' => '/admin/vol/' . $this->id,
+        ];
+    }
+
+    public function toEvent(): array
+    {
+        return [
+            'title' => $this->compagnie . ' - ' . $this->destination,
+            'start' => $this->date_depart,
+            'end' => $this->date_arrivee,
+            'description' => sprintf(
+                'From: %s\nTo: %s\nPrice: %s€',
+                $this->aeroport_depart,
+                $this->aeroport_arrivee,
+                $this->prix
+            ),
+            'backgroundColor' => '#4e73df',
+            'borderColor' => '#4e73df',
+            'textColor' => '#fff',
+            'url' => '/admin/vol/' . $this->id,
+        ];
+    }
 }
