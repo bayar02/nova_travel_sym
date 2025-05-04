@@ -16,8 +16,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
 
-#[Route('/admin')] // Prefix all routes in this controller with /admin
-#[IsGranted('ROLE_ADMIN')] // Ensure only admins can access any route here
+#[Route('/admin')] 
+#[IsGranted('ROLE_ADMIN')] 
 class AdminController extends AbstractController
 {
     #[Route('/', name: 'app_admin')]
@@ -83,7 +83,7 @@ class AdminController extends AbstractController
         $pagination = $paginator->paginate(
             $qb,
             $page,
-            10 // Items per page
+            5
         );
 
         return $this->render('admin/user/index.html.twig', [
@@ -98,12 +98,10 @@ class AdminController extends AbstractController
     public function userNew(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
-        // Use RegistrationFormType for creation (includes password)
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Encode the plain password
              /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
             $user->setPassword(
@@ -113,8 +111,7 @@ class AdminController extends AbstractController
                 )
             );
 
-            // Optionally set default roles for admin-created users
-            // $user->setRoles(['ROLE_USER']); 
+           
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -125,7 +122,7 @@ class AdminController extends AbstractController
         }
 
         return $this->render('admin/user/new.html.twig', [
-            'registrationForm' => $form->createView(), // Use registrationForm to match template expectations
+            'registrationForm' => $form->createView(), 
         ]);
     }
 
@@ -137,7 +134,7 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush(); // No need to persist, object is already managed
+            $entityManager->flush();
 
             $this->addFlash('success', 'User updated successfully!');
 
@@ -191,13 +188,11 @@ class AdminController extends AbstractController
         $filteredRoles = array_filter($newRoles, fn($role) => in_array($role, $validRoles));
 
         if (empty($filteredRoles)) {
-            // If filtering results in empty, default to ROLE_USER?
-            // Or return error? Returning error for now.
+            
              return $this->json(['success' => false, 'message' => 'No valid roles provided.'], Response::HTTP_BAD_REQUEST);
         }
         
-        // Prevent removing the last ROLE_ADMIN if needed (optional safeguard)
-        // This logic might need adjustment based on how you manage admin roles
+      
         $adminRepository = $entityManager->getRepository(User::class);
         $adminCount = count($adminRepository->findByRole('ROLE_ADMIN'));
         if (in_array('ROLE_ADMIN', $user->getRoles()) && !in_array('ROLE_ADMIN', $filteredRoles) && $adminCount <= 1) {
@@ -210,5 +205,4 @@ class AdminController extends AbstractController
         return $this->json(['success' => true, 'message' => 'Roles updated successfully.']);
     }
 
-    // Add other admin-specific actions here...
 }

@@ -61,6 +61,7 @@ class OAuthAuthenticator extends OAuth2Authenticator
                 $user->setCin('AUTO-' . uniqid());
                 $user->setTel('');
                 $user->setPassword('');
+                $user->setRoles(['ROLE_USER']);
                 
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
