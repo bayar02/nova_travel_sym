@@ -24,12 +24,7 @@ class AuthController extends AbstractController
         // --- Registration Form Logic --- 
         $user = new User();
         $registrationForm = $this->createForm(RegistrationFormType::class, $user);
-        // Note: We are NOT handling the form submission here.
-        // It assumes a separate controller (e.g., RegistrationController)
-        // handles the POST request to the 'app_register' route.
-        // If you want *this* controller to also handle registration POST,
-        // you'd need to add `$registrationForm->handleRequest($request);` 
-        // and the processing logic (if ($registrationForm->isSubmitted() && $registrationForm->isValid()) { ... })
+     
 
         // Render the correct template with necessary variables
         return $this->render('security/login.html.twig', [

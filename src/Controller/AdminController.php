@@ -12,8 +12,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-#[Route('/admin')] // Prefix all routes in this controller with /admin
-#[IsGranted('ROLE_ADMIN')] // Ensure only admins can access any route here
+#[Route('/admin')] 
+#[IsGranted('ROLE_ADMIN')] 
 class AdminController extends AbstractController
 {
     #[Route('/currency/modal', name: 'admin_currency_modal')]

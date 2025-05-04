@@ -37,14 +37,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private ?string $cin = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $tel = null;
+    #[ORM\Column(type: 'string')]
+    private ?string $tel = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $resetToken = null;
+    private ?string $reset_token = null;
 
     private ?string $plainPassword = null;
 
@@ -147,12 +147,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getTel(): ?int
+    public function getTel(): ?string
     {
         return $this->tel;
     }
 
-    public function setTel(int $tel): self
+    public function setTel(string $tel): self
     {
         $this->tel = $tel;
         return $this;
@@ -172,12 +172,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getResetToken(): ?string
     {
-        return $this->resetToken;
+        return $this->reset_token;
     }
 
-    public function setResetToken(?string $resetToken): static
+    public function setResetToken(?string $reset_token): static
     {
-        $this->resetToken = $resetToken;
+        $this->reset_token = $reset_token;
         return $this;
     }
 
