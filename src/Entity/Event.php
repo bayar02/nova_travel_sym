@@ -99,15 +99,26 @@ class Event
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'decimal', precision: 10, scale: 0, nullable: false)]
     private ?string $prix = null;
 
     public function getPrix(): ?string
+=======
+    #[ORM\Column(type: 'decimal', nullable: false)]
+    private ?float $prix = null;
+
+    public function getPrix(): ?float
+>>>>>>> f5842df (Initial commit for Events branch)
     {
         return $this->prix;
     }
 
+<<<<<<< HEAD
     public function setPrix(string $prix): self
+=======
+    public function setPrix(float $prix): self
+>>>>>>> f5842df (Initial commit for Events branch)
     {
         $this->prix = $prix;
         return $this;

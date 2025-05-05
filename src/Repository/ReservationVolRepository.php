@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\ReservationVol;
+<<<<<<< HEAD
 use App\Entity\User;
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +20,7 @@ class ReservationVolRepository extends ServiceEntityRepository
         parent::__construct($registry, ReservationVol::class);
     }
 
+<<<<<<< HEAD
     /**
      * Find all flight reservations for a specific user with flight details
      * 
@@ -35,6 +39,8 @@ class ReservationVolRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
     //    /**
     //     * @return ReservationVol[] Returns an array of ReservationVol objects
     //     */

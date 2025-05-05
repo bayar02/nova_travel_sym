@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Remove the LoginSuccessHandler service definition if it exists at the top
 # services:
 #     App\Security\LoginSuccessHandler:
@@ -7,6 +8,9 @@
 
 security:
     enable_authenticator_manager: true # Ensure this is true (usually default)
+=======
+security:
+>>>>>>> f5842df (Initial commit for Events branch)
     password_hashers:
         App\Entity\User:
             algorithm: auto
@@ -25,6 +29,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+<<<<<<< HEAD
             # Remove form_login section as AuthAuthenticator handles it
             # form_login:
             #     login_path: app_login
@@ -36,6 +41,15 @@ security:
                 target: app_login # Redirect back to login on logout
             
             # Explicitly use the custom authenticator
+=======
+            entry_point: App\Security\AuthAuthenticator  # 👈 Add this line
+            form_login:
+                login_path: login
+                check_path: login
+            logout:
+                path: logout
+                target: /
+>>>>>>> f5842df (Initial commit for Events branch)
             custom_authenticator: App\Security\AuthAuthenticator
 
             remember_me:

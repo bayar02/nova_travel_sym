@@ -1,0 +1,39 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block body %}
+    <section id="services" class="services section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Events</h2>
+        <p>Discover upcoming events and plan your participation.</p>
+      </div><!-- End Section Title -->
+
+      <div class="container">
+
+        <div class="row gy-4">
+
+            {% for event in events %}
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+            <div class="service-item position-relative">
+              <div class="icon">
+                <i class="bi bi-calendar-check"></i>
+              </div>
+              <h3>{{ event.nom }}</h3>
+              <p>{{ event.description }}</p>
+              <h4>Location: {{ event.lieu }}</h4>
+              <h4>Date: {{ event.dateEvent|date('Y-m-d') }}</h4>
+              <h4>Duration: {{ event.duree }} hours</h4>
+              <h4>Price: {{ event.prix }}€</h4>
+              <a href="event-details.html" class="readmore stretched-link">Read more <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </div><!-- End Service Item -->
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+    </section><!-- /Services Section -->
+
+{% endblock %}

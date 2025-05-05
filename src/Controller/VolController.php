@@ -25,6 +25,7 @@ final class VolController extends AbstractController
     #[Route('/new', name: 'app_vol_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+<<<<<<< HEAD
         // For admin users, redirect to the admin flight index page
         // where they can create flights using the modal
         if ($this->isGranted('ROLE_ADMIN')) {
@@ -32,6 +33,8 @@ final class VolController extends AbstractController
         }
         
         // This is for non-admin users or direct access
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
         $vol = new Vol();
         $form = $this->createForm(VolType::class, $vol);
         $form->handleRequest($request);
@@ -60,12 +63,15 @@ final class VolController extends AbstractController
     #[Route('/{id}/edit', name: 'app_vol_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Vol $vol, EntityManagerInterface $entityManager): Response
     {
+<<<<<<< HEAD
         // For admin users, redirect to the admin flight index page
         // where they can edit flights using the modal
         if ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_flight_index');
         }
         
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
         $form = $this->createForm(VolType::class, $vol);
         $form->handleRequest($request);
 
@@ -91,6 +97,7 @@ final class VolController extends AbstractController
 
         return $this->redirectToRoute('app_vol_index', [], Response::HTTP_SEE_OTHER);
     }
+<<<<<<< HEAD
 
     #[Route('/new/ajax', name: 'app_vol_new_ajax', methods: ['POST'])]
     public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
@@ -275,4 +282,6 @@ final class VolController extends AbstractController
             return $this->json(['success' => false, 'message' => 'An error occurred while updating the flight'], 500);
         }
     }
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 }

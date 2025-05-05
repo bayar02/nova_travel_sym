@@ -15,7 +15,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+<<<<<<< HEAD
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 
 class AuthAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -23,10 +26,14 @@ class AuthAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
+<<<<<<< HEAD
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private AuthorizationCheckerInterface $authorizationChecker
     )
+=======
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
+>>>>>>> f5842df (Initial commit for Events branch)
     {
     }
 
@@ -48,6 +55,7 @@ class AuthAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+<<<<<<< HEAD
         // Check if user has ROLE_ADMIN
         if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
             return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
@@ -55,6 +63,17 @@ class AuthAuthenticator extends AbstractLoginFormAuthenticator
 
         // Redirect regular users to their dashboard
         return new RedirectResponse($this->urlGenerator->generate('user_dashboard'));
+=======
+        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+            return new RedirectResponse($targetPath);
+        }
+
+        // For example:
+        // return new RedirectResponse($this->urlGenerator->generate('some_route'));
+        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        //return new RedirectResponse($this->urlGenerator->generate('app_home'));
+
+>>>>>>> f5842df (Initial commit for Events branch)
     }
 
     protected function getLoginUrl(Request $request): string

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+<<<<<<< HEAD
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,4 +46,19 @@ class AuthController extends AbstractController
         // This method can be empty - it will be intercepted by the logout key on the firewall
         // The logic is handled by Symfony's security system
     }
+=======
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class AuthController extends AbstractController
+{
+    #[Route('/', name: 'app_home')]
+    public function login(): Response
+    {
+        return $this->render('auth/login.html.twig', [
+            'controller_name' => 'AuthController',
+        ]);
+    }
+>>>>>>> f5842df (Initial commit for Events branch)
 } 

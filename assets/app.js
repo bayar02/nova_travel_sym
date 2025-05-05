@@ -7,6 +7,9 @@ import './bootstrap.js';
  */
 import './styles/app.css';
 import './styles/auth.css';
+<<<<<<< HEAD
 import './js/admin_sidebar.js';
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

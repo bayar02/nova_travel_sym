@@ -26,6 +26,12 @@
             "./migrations/.gitignore"
         ]
     },
+<<<<<<< HEAD
+=======
+    "knplabs/knp-paginator-bundle": {
+        "version": "v6.0.0"
+    },
+>>>>>>> f5842df (Initial commit for Events branch)
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {
@@ -283,9 +289,12 @@
             "./config/routes/web_profiler.yaml"
         ]
     },
+<<<<<<< HEAD
     "symfonycasts/verify-email-bundle": {
         "version": "v1.17.3"
     },
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
     "twig/extra-bundle": {
         "version": "v3.20.0"
     }

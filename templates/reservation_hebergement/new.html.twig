@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block title %}New ReservationHebergement{% endblock %}
 
 {% block body %}
@@ -8,4 +9,73 @@
     {{ include('reservation_hebergement/_form.html.twig') }}
 
     <a href="{{ path('app_reservation_hebergement_index') }}">back to list</a>
+=======
+{% block title %}Nouvelle Réservation{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 80px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007BFF;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button.btn {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button.btn:hover {
+            background-color: #0056b3;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Nouvelle Réservation</h1>
+    {{ include('reservation_hebergement/_form.html.twig') }}
+    <a href="{{ path('app_reservation_hebergement_index') }}" class="back-link">← Retour à la liste</a>
+</div>
+>>>>>>> f5842df (Initial commit for Events branch)
 {% endblock %}

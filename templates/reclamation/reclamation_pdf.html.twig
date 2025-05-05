@@ -1,0 +1,73 @@
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h2 class="title-centered">Détails du reclamation</h2> <!-- Titre centré et décoré -->
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-box">
+                        <h5><strong class="title-color">Date :</strong></h5>
+                        <p class="info-text text-color">{{ reclamation.date_reclamation }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-box">
+                        <h5><strong class="title-color">Type :</strong></h5>
+                        <p class="info-text text-color">{{ reclamation.type }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-box">
+                        <h5><strong class="title-color">Message :</strong></h5>
+                        <p class="info-text text-color">{{ reclamation.message }}</p>
+                    </div>
+                </div>
+                
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Titre centré et décoré */
+    .title-centered {
+        text-align: center; /* Centre le titre */
+        color: #4e73df; /* Change la couleur du titre */
+        font-family: 'Arial', sans-serif; /* Utilise une police moderne */
+        font-weight: 600; /* Titre plus gras */
+        font-size: 36px; /* Taille du titre */
+        padding: 10px; /* Espacement autour du titre */
+        background-color: #f1f1f1; /* Fond du titre */
+        border-radius: 8px; /* Bordure arrondie */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+        margin-bottom: 20px; /* Espace sous le titre */
+    }
+
+    /* Boîtes d'informations */
+    .info-box {
+        background-color: #f8f9fc; /* Fond clair */
+        padding: 15px;
+        margin-bottom: 20px; /* Espacement entre les boîtes */
+        border-radius: 8px; /* Bordures arrondies */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre subtile */
+    }
+
+    /* Couleur des titres des éléments */
+    .title-color {
+        color: #2c3e50; /* Couleur des titres */
+        font-weight: bold;
+    }
+
+    /* Couleur du texte des informations */
+    .text-color {
+        color: #34495e; /* Couleur du texte */
+        font-size: 16px;
+    }
+</style>
+{% endblock %}

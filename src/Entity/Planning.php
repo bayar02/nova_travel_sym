@@ -56,7 +56,20 @@ class Planning
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'plannings')]
+=======
+    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'plannings')]
+    #[ORM\JoinTable(
+        name: 'planning_events',
+        joinColumns: [
+            new ORM\JoinColumn(name: 'id_planning', referencedColumnName: 'id')
+        ],
+        inverseJoinColumns: [
+            new ORM\JoinColumn(name: 'id_event', referencedColumnName: 'id')
+        ]
+    )]
+>>>>>>> f5842df (Initial commit for Events branch)
     private Collection $events;
 
     public function __construct()

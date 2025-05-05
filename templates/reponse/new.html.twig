@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block title %}New Reponse{% endblock %}
 
 {% block body %}
@@ -8,4 +9,93 @@
     {{ include('reponse/_form.html.twig') }}
 
     <a href="{{ path('app_reponse_index') }}">back to list</a>
+=======
+{% block title %}Nouvelle Réponse{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 80px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007BFF;
+        }
+
+        form .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        button.btn {
+            width: 100%;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button.btn:hover {
+            background-color: #0056b3;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Créer une Réponse</h1>
+        <br><br>
+
+        {{ include('reponse/_form.html.twig') }}
+
+        <a href="{{ path('app_reponse_index') }}" class="back-link">← Retour à la liste</a>
+    </div>
+>>>>>>> f5842df (Initial commit for Events branch)
 {% endblock %}

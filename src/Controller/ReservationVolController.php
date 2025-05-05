@@ -3,16 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\ReservationVol;
+<<<<<<< HEAD
 use App\Entity\Vol;
 use App\Form\ReservationVolType;
 use App\Repository\ReservationVolRepository;
 use App\Repository\VolRepository;
+=======
+use App\Form\ReservationVolType;
+use App\Repository\ReservationVolRepository;
+>>>>>>> f5842df (Initial commit for Events branch)
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+<<<<<<< HEAD
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 
 #[Route('/reservation/vol')]
 final class ReservationVolController extends AbstractController
@@ -81,6 +89,7 @@ final class ReservationVolController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_vol_index', [], Response::HTTP_SEE_OTHER);
     }
+<<<<<<< HEAD
 
     #[Route('/user/flights', name: 'app_user_flights', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
@@ -132,4 +141,6 @@ final class ReservationVolController extends AbstractController
             'reservation' => $reservation,
         ]);
     }
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 }

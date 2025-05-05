@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 {% extends 'base.html.twig' %}
+=======
+ {% extends 'base_back.html.twig' %} 
+>>>>>>> f5842df (Initial commit for Events branch)
 
 {% block title %}Event index{% endblock %}
 
@@ -25,12 +29,22 @@
                 <td>{{ event.nom }}</td>
                 <td>{{ event.description }}</td>
                 <td>{{ event.lieu }}</td>
+<<<<<<< HEAD
                 <td>{{ event.dateEvent }}</td>
+=======
+                <td>{{ event.dateEvent ? event.dateEvent|date('Y-m-d') : 'No Date' }}</td>
+>>>>>>> f5842df (Initial commit for Events branch)
                 <td>{{ event.duree }}</td>
                 <td>{{ event.prix }}</td>
                 <td>
                     <a href="{{ path('app_event_show', {'id': event.id}) }}">show</a>
                     <a href="{{ path('app_event_edit', {'id': event.id}) }}">edit</a>
+<<<<<<< HEAD
+=======
+                    
+<a href="{{ path('app_event_qr', {'id': event.id}) }}">Generate QR</a>
+
+>>>>>>> f5842df (Initial commit for Events branch)
                 </td>
             </tr>
         {% else %}
@@ -42,4 +56,41 @@
     </table>
 
     <a href="{{ path('app_event_new') }}">Create new</a>
+<<<<<<< HEAD
 {% endblock %}
+=======
+<script>
+  const eventLabels = {{ events|map(e => e.nom)|json_encode|raw }};
+  const eventPrices = {{ events|map(e => e.prix)|json_encode|raw }};
+</script>
+<canvas id="eventChart" height="100"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('eventChart').getContext('2d');
+  const eventChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: eventLabels,
+      datasets: [{
+        label: 'Prix des événements',
+        data: eventPrices,
+        backgroundColor: 'rgba(23, 125, 255, 0.6)',
+        borderColor: 'rgba(23, 125, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+  
+ 
+</script>
+{% endblock %}   
+>>>>>>> f5842df (Initial commit for Events branch)

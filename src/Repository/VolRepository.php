@@ -16,6 +16,7 @@ class VolRepository extends ServiceEntityRepository
         parent::__construct($registry, Vol::class);
     }
 
+<<<<<<< HEAD
     /**
      * Find upcoming flights (departure date in the future)
      * 
@@ -99,6 +100,8 @@ class VolRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
     //    /**
     //     * @return Vol[] Returns an array of Vol objects
     //     */

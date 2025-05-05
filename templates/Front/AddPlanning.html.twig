@@ -1,0 +1,41 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block body %}
+<section id="contact" class="contact section">
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Add Planning</h2>
+  </div><!-- End Section Title -->
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row gx-lg-0 gy-4">
+      <div class="col-lg-8">
+      {{ form_start(form) }}
+        <div class="row gy-4">
+
+          <div class="col-md-12">
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Planning Name'}}) }}
+            <div class="text-danger">{{ form_errors(form.nom) }}</div>
+          </div>
+
+          <div class="col-md-12">
+            {{ form_label(form.date_creation) }}
+            {{ form_widget(form.date_creation, {'attr': {'class': 'form-control', 'placeholder': 'Creation Date'}}) }}
+            <div class="text-danger">{{ form_errors(form.date_creation) }}</div>
+          </div>
+
+          <div class="col-md-12 text-center">
+            <div class="loading">Loading</div>
+            <div class="error-message"></div>
+            <div class="sent-message">Your planning has been added successfully!</div>
+
+            <button type="submit">Submit Planning</button>
+          </div>
+        </div>
+        {{ form_end(form) }}
+      </div><!-- End Contact Form -->
+    </div>
+  </div>
+</section><!-- /Contact Section -->
+{% endblock %}

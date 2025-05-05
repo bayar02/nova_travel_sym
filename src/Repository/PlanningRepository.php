@@ -16,6 +16,7 @@ class PlanningRepository extends ServiceEntityRepository
         parent::__construct($registry, Planning::class);
     }
 
+<<<<<<< HEAD
     //    /**
     //     * @return Planning[] Returns an array of Planning objects
     //     */
@@ -40,4 +41,48 @@ class PlanningRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+=======
+    /**
+     * Find all Planning entities.
+     *
+     * @return Planning[] Returns an array of Planning objects
+     */
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.nom', 'ASC') // Sorting by name
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Search plannings by name.
+     *
+     * @param string $name
+     * @return Planning[] Returns an array of Planning objects
+     */
+    public function searchByName(string $name): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.nom LIKE :name')
+            ->setParameter('name', '%' . $name . '%') // Partial match search
+            ->orderBy('p.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Get all plannings sorted by name.
+     *
+     * @param string $order ASC or DESC
+     * @return Planning[] Returns an array of Planning objects
+     */
+    public function getSortedByName(string $order = 'ASC'): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.nom', $order)
+            ->getQuery()
+            ->getResult();
+    }
+>>>>>>> f5842df (Initial commit for Events branch)
 }

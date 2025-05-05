@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f5842df (Initial commit for Events branch)
 #[Route('/reservation/hebergement')]
 final class ReservationHebergementController extends AbstractController
 {
@@ -30,6 +34,11 @@ final class ReservationHebergementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+<<<<<<< HEAD
+=======
+            $user = $entityManager->getRepository(User::class)->find(1);
+
+>>>>>>> f5842df (Initial commit for Events branch)
             $entityManager->persist($reservationHebergement);
             $entityManager->flush();
 

@@ -3,7 +3,10 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+<<<<<<< HEAD
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +14,10 @@ use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
+<<<<<<< HEAD
 #[UniqueEntity(fields: ['mail'], message: 'There is already an account with this mail')]
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -40,6 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private ?int $tel = null;
 
+<<<<<<< HEAD
     #[ORM\Column]
     private bool $isVerified = false;
 
@@ -52,6 +59,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ReservationVol::class, orphanRemoval: true)]
     private Collection $reservationVols;
 
+=======
+>>>>>>> f5842df (Initial commit for Events branch)
     // Constructor + relations (same as yours)
     public function __construct()
     {
@@ -105,6 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMail(): ?string { return $this->mail; }
     public function setMail(string $mail): self { $this->mail = $mail; return $this; }
 
+<<<<<<< HEAD
     public function getNom(): ?string
     {
         return $this->nom;
@@ -250,4 +260,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+=======
+    // Add getters/setters for other fields (nom, prenom, etc.) if needed...
+>>>>>>> f5842df (Initial commit for Events branch)
 }

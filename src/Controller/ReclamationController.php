@@ -3,6 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Reclamation;
+<<<<<<< HEAD
+=======
+use App\Entity\User;
+>>>>>>> f5842df (Initial commit for Events branch)
 use App\Form\ReclamationType;
 use App\Repository\ReclamationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+<<<<<<< HEAD
 
 #[Route('/reclamation')]
 final class ReclamationController extends AbstractController
@@ -21,6 +26,37 @@ final class ReclamationController extends AbstractController
             'reclamations' => $reclamationRepository->findAll(),
         ]);
     }
+=======
+use Knp\Component\Pager\PaginatorInterface;
+use Knp\Snappy\Pdf;
+use Doctrine\ORM\Mapping as ORM;
+use Knp\Snappy\Pdf as SnappyPdf;
+use Knp\Snappy\Pdf\Response as PdfResponse;
+use Dompdf\Dompdf;
+#[Route('/reclamation')]
+final class ReclamationController extends AbstractController
+{
+
+
+
+
+    #[Route(name: 'app_reclamation_index', methods: ['GET'])]
+    public function index(Request $request, ReclamationRepository $reclamationRepository, PaginatorInterface $paginator): Response
+{
+    $query = $reclamationRepository->createQueryBuilder('r')->getQuery();
+
+
+    $reclamations = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1), 
+        3 // number of items per page
+    );
+
+    return $this->render('reclamation/index.html.twig', [
+        'reclamations' => $reclamations,
+    ]);
+}
+>>>>>>> f5842df (Initial commit for Events branch)
 
     #[Route('/new', name: 'app_reclamation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -30,10 +66,21 @@ final class ReclamationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+<<<<<<< HEAD
             $entityManager->persist($reclamation);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
+=======
+            // 🔥 Manually fetch the user with ID = 1 and assign it
+            $user = $entityManager->getRepository(User::class)->find(1);
+            $reclamation->setUser($user);
+
+            $entityManager->persist($reclamation);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_reclamation_index');
+>>>>>>> f5842df (Initial commit for Events branch)
         }
 
         return $this->render('reclamation/new.html.twig', [
@@ -78,4 +125,36 @@ final class ReclamationController extends AbstractController
 
         return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
     }
+<<<<<<< HEAD
+=======
+  ////////////////////////////////////////////// FRONT //////////////////////////////////////
+  #[Route('/reclamation/{id}/pdf', name: 'reclamation_pdf')]
+  public function reclamationPdf(int $id, EntityManagerInterface $entityManager): Response
+  {
+      // Récupérer le régime concerné
+      $reclamation = $entityManager->getRepository(Reclamation::class)->find($id);
+  
+     
+      // Générer le HTML pour le régime
+      $html = $this->renderView('reclamation/reclamation_pdf.html.twig', [
+          'reclamation' => $reclamation,
+      ]);
+  
+      // Configurer Dompdf
+      $dompdf = new Dompdf();
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'portrait');
+      $dompdf->render();
+  
+      // Retourner le PDF en réponse
+      return new Response($dompdf->output(), 200, [
+          'Content-Type' => 'application/pdf',
+          'Content-Disposition' => 'inline; filename="reclamation_' . $reclamation->getId() . '.pdf"',
+      ]);
+  }
+
+
+
+
+>>>>>>> f5842df (Initial commit for Events branch)
 }

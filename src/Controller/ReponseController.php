@@ -10,15 +10,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+<<<<<<< HEAD
+=======
+use Knp\Component\Pager\PaginatorInterface;
+>>>>>>> f5842df (Initial commit for Events branch)
 
 #[Route('/reponse')]
 final class ReponseController extends AbstractController
 {
     #[Route(name: 'app_reponse_index', methods: ['GET'])]
+<<<<<<< HEAD
     public function index(ReponseRepository $reponseRepository): Response
     {
         return $this->render('reponse/index.html.twig', [
             'reponses' => $reponseRepository->findAll(),
+=======
+    public function index(Request $request,ReponseRepository $reponseRepository, PaginatorInterface $paginator): Response
+    {
+        $query = $reponseRepository->createQueryBuilder('r')->getQuery();
+
+
+        $reponses = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // page number, default 1
+            3 // number of items per page
+        );
+        return $this->render('reponse/index.html.twig', [
+            'reponses' => $reponses,
+>>>>>>> f5842df (Initial commit for Events branch)
         ]);
     }
 
