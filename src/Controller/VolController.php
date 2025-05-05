@@ -92,228 +92,49 @@ class VolController extends AbstractController
         return $this->redirectToRoute('app_vol_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/new/ajax', name: 'app_vol_new_ajax', methods: ['POST'])]
-    public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // Check if it's an AJAX request
-        if (!$request->isXmlHttpRequest()) {
-            return $this->json(['success' => false, 'message' => 'Only AJAX requests are allowed'], 400);
-        }
-        
-        // Create a new Vol instance
-        $vol = new Vol();
-        
-        // Get data from the request
-        $compagnie = $request->request->get('compagnie');
-        $destination = $request->request->get('destination');
-        $aeroportDepart = $request->request->get('aeroport_depart');
-        $aeroportArrivee = $request->request->get('aeroport_arrivee');
-        $dateDepart = $request->request->get('date_depart');
-        $dateArrivee = $request->request->get('date_arrivee');
-        $prix = $request->request->get('prix');
-        
-        // Validate the data
-        $errors = [];
-        
-        if (empty($compagnie)) {
-            $errors['compagnie'] = 'Company name is required';
-        }
-        
-        if (empty($destination)) {
-            $errors['destination'] = 'Destination is required';
-        }
-        
-        if (empty($aeroportDepart)) {
-            $errors['aeroport_depart'] = 'Departure airport is required';
-        }
-        
-        if (empty($aeroportArrivee)) {
-            $errors['aeroport_arrivee'] = 'Arrival airport is required';
-        }
-        
-        if (empty($dateDepart)) {
-            $errors['date_depart'] = 'Departure date is required';
-        }
-        
-        if (empty($dateArrivee)) {
-            $errors['date_arrivee'] = 'Arrival date is required';
-        }
-        
-        if (empty($prix)) {
-            $errors['prix'] = 'Price is required';
-        } elseif (!is_numeric($prix) || $prix <= 0) {
-            $errors['prix'] = 'Price must be a positive number';
-        }
-        
-        // Check if departure date is before arrival date
-        if (!empty($dateDepart) && !empty($dateArrivee)) {
-            $departureDate = new \DateTime($dateDepart);
-            $arrivalDate = new \DateTime($dateArrivee);
-            
-            if ($arrivalDate <= $departureDate) {
-                $errors['date_arrivee'] = 'Arrival date must be after departure date';
-            }
-        }
-        
-        // If there are validation errors, return them
-        if (!empty($errors)) {
-            return $this->json(['success' => false, 'errors' => $errors], 400);
-        }
-        
-        try {
-            // Set the data on the Vol entity
-            $vol->setCompagnie($compagnie);
-            $vol->setDestination($destination);
-            $vol->setAeroportDepart($aeroportDepart);
-            $vol->setAeroportArrivee($aeroportArrivee);
-            $vol->setDateDepart(new \DateTime($dateDepart));
-            $vol->setDateArrivee(new \DateTime($dateArrivee));
-            $vol->setPrix((float) $prix);
-            
-            // Save to database
-            $entityManager->persist($vol);
-            $entityManager->flush();
-            
-            // Return success response
-            return $this->json(['success' => true, 'message' => 'Flight created successfully']);
-            
-        } catch (\Exception $e) {
-            // Log the error
-            error_log($e->getMessage());
-            
-            // Return error response
-            return $this->json(['success' => false, 'message' => 'An error occurred while creating the flight'], 500);
-        }
-    }
-
-    #[Route('/{id}/edit/ajax', name: 'app_vol_edit_ajax', methods: ['POST'])]
-    public function editAjax(Request $request, Vol $vol, EntityManagerInterface $entityManager): Response
-    {
-        // Check if it's an AJAX request
-        if (!$request->isXmlHttpRequest()) {
-            return $this->json(['success' => false, 'message' => 'Only AJAX requests are allowed'], 400);
-        }
-        
-        // Get data from the request
-        $compagnie = $request->request->get('compagnie');
-        $destination = $request->request->get('destination');
-        $aeroportDepart = $request->request->get('aeroport_depart');
-        $aeroportArrivee = $request->request->get('aeroport_arrivee');
-        $dateDepart = $request->request->get('date_depart');
-        $dateArrivee = $request->request->get('date_arrivee');
-        $prix = $request->request->get('prix');
-        
-        // Validate the data
-        $errors = [];
-        
-        if (empty($compagnie)) {
-            $errors['compagnie'] = 'Company name is required';
-        }
-        
-        if (empty($destination)) {
-            $errors['destination'] = 'Destination is required';
-        }
-        
-        if (empty($aeroportDepart)) {
-            $errors['aeroport_depart'] = 'Departure airport is required';
-        }
-        
-        if (empty($aeroportArrivee)) {
-            $errors['aeroport_arrivee'] = 'Arrival airport is required';
-        }
-        
-        if (empty($dateDepart)) {
-            $errors['date_depart'] = 'Departure date is required';
-        }
-        
-        if (empty($dateArrivee)) {
-            $errors['date_arrivee'] = 'Arrival date is required';
-        }
-        
-        if (empty($prix)) {
-            $errors['prix'] = 'Price is required';
-        } elseif (!is_numeric($prix) || $prix <= 0) {
-            $errors['prix'] = 'Price must be a positive number';
-        }
-        
-        // Check if departure date is before arrival date
-        if (!empty($dateDepart) && !empty($dateArrivee)) {
-            $departureDate = new \DateTime($dateDepart);
-            $arrivalDate = new \DateTime($dateArrivee);
-            
-            if ($arrivalDate <= $departureDate) {
-                $errors['date_arrivee'] = 'Arrival date must be after departure date';
-            }
-        }
-        
-        // If there are validation errors, return them
-        if (!empty($errors)) {
-            return $this->json(['success' => false, 'errors' => $errors], 400);
-        }
-        
-        try {
-            // Update the Vol entity with the new data
-            $vol->setCompagnie($compagnie);
-            $vol->setDestination($destination);
-            $vol->setAeroportDepart($aeroportDepart);
-            $vol->setAeroportArrivee($aeroportArrivee);
-            $vol->setDateDepart(new \DateTime($dateDepart));
-            $vol->setDateArrivee(new \DateTime($dateArrivee));
-            $vol->setPrix((float) $prix);
-            
-            // Save to database
-            $entityManager->flush();
-            
-            // Return success response
-            return $this->json(['success' => true, 'message' => 'Flight updated successfully']);
-            
-        } catch (\Exception $e) {
-            // Log the error
-            error_log($e->getMessage());
-            
-            // Return error response
-            return $this->json(['success' => false, 'message' => 'An error occurred while updating the flight'], 500);
-        }
-    }
-
     #[Route('/search/ajax', name: 'app_vol_search_ajax', methods: ['GET'])]
     public function searchAjax(Request $request, VolRepository $volRepository): Response
     {
-        // Get search parameters
         $destination = $request->query->get('destination');
-        $aeroportArrivee = $request->query->get('aeroport_arrivee');
         $dateStart = $request->query->get('dateStart');
         $dateEnd = $request->query->get('dateEnd');
         $sortBy = $request->query->get('sortBy', 'date');
-
-        // Build search criteria
-        $criteria = array_filter([
-            'destination' => $destination,
-            'aeroport_arrivee' => $aeroportArrivee,
-            'dateStart' => $dateStart,
-            'dateEnd' => $dateEnd,
-        ]);
-
-        // Get results
-        $flights = $volRepository->searchFlights($criteria, $sortBy)
-            ->getQuery()
-            ->getResult();
-
-        // Format results for JSON response
-        $results = array_map(function($flight) {
+        
+        $criteria = [];
+        
+        if ($destination) {
+            $criteria['destination'] = $destination;
+        }
+        
+        if ($dateStart) {
+            $criteria['dateStart'] = $dateStart;
+        }
+        
+        if ($dateEnd) {
+            $criteria['dateEnd'] = $dateEnd;
+        }
+        
+        $queryBuilder = $volRepository->searchFlights($criteria, $sortBy);
+        $flights = $queryBuilder->getQuery()->getResult();
+        
+        // Format flights for JSON response
+        $formattedFlights = array_map(function($flight) {
             return [
                 'id' => $flight->getId(),
                 'compagnie' => $flight->getCompagnie(),
-                'destination' => $flight->getDestination(),
                 'aeroportDepart' => $flight->getAeroportDepart(),
                 'aeroportArrivee' => $flight->getAeroportArrivee(),
-                'dateDepart' => $flight->getDateDepart()->format('Y-m-d H:i'),
-                'dateArrivee' => $flight->getDateArrivee()->format('Y-m-d H:i'),
+                'dateDepart' => $flight->getDateDepart() ? $flight->getDateDepart()->format('d M Y H:i') : '',
+                'dateArrivee' => $flight->getDateArrivee() ? $flight->getDateArrivee()->format('d M Y H:i') : '',
                 'prix' => $flight->getPrix(),
+                'destination' => $flight->getDestination()
             ];
         }, $flights);
-
-        return $this->json(['success' => true, 'flights' => $results]);
+        
+        return $this->json([
+            'success' => true,
+            'flights' => $formattedFlights
+        ]);
     }
 
     #[Route('/airports/autocomplete', name: 'app_vol_airports_autocomplete', methods: ['GET'])]
@@ -348,12 +169,23 @@ class VolController extends AbstractController
         return $this->json($flights);
     }
 
-    #[Route('/admin/new/modal', name: 'admin_vol_new_modal', methods: ['GET'])]
+    #[Route('/admin/vol/new/modal', name: 'admin_vol_new_modal', methods: ['GET'])]
     public function newModal(): Response
     {
-        return $this->render('admin/vol/_form_modal.html.twig', [
-            'action' => $this->generateUrl('app_vol_new_ajax')
-        ]);
+        try {
+            $vol = new Vol();
+            $form = $this->createForm(VolType::class, $vol, [
+                'action' => $this->generateUrl('app_vol_new_ajax'),
+                'attr' => ['id' => 'flightForm']
+            ]);
+
+            return $this->render('admin/vol/_form_modal.html.twig', [
+                'form' => $form->createView(),
+                'action' => $this->generateUrl('app_vol_new_ajax')
+            ]);
+        } catch (\Exception $e) {
+            return new Response('Error creating form: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     #[Route('/admin/{id}/edit/modal', name: 'admin_vol_edit_modal', methods: ['GET'])]
@@ -379,10 +211,45 @@ class VolController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $limit = $request->query->getInt('limit', 10);
         
-        $flights = $volRepository->findBy([], ['date_depart' => 'DESC']);
+        $flights = $volRepository->findBy([], ['dateDepart' => 'DESC'], $limit, ($page - 1) * $limit);
+        $total = $volRepository->count([]);
         
         return $this->render('admin/vol/_list.html.twig', [
-            'flights' => $flights
+            'flights' => $flights,
+            'currentPage' => $page,
+            'totalPages' => ceil($total / $limit)
         ]);
     }
-}
+
+    #[Route('/admin/new/ajax', name: 'app_vol_new_ajax', methods: ['POST'])]
+    public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $vol = new Vol();
+        $form = $this->createForm(VolType::class, $vol);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($vol);
+            $entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Flight added successfully'
+            ]);
+        }
+
+        return $this->json([
+            'success' => false,
+            'errors' => $this->getFormErrors($form)
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
+    private function getFormErrors($form): array
+    {
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+        return $errors;
+    }
+} 

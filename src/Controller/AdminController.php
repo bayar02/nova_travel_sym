@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Vol;
+use App\Form\VolType;
 use App\Repository\VolRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -104,12 +105,23 @@ class AdminController extends AbstractController
     public function delete(Request $request, Vol $vol, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$vol->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($vol);
-            $entityManager->flush();
-            $this->addFlash('success', 'Flight deleted successfully');
+            try {
+                // Vérifier s'il y a des réservations liées
+                $reservations = $vol->getReservationVols();
+                if (count($reservations) > 0) {
+                    $this->addFlash('error', 'Impossible de supprimer ce vol car il a des réservations associées.');
+                    return $this->redirectToRoute('admin_flight_index');
+                }
+
+                $entityManager->remove($vol);
+                $entityManager->flush();
+                $this->addFlash('success', 'Vol supprimé avec succès');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la suppression du vol.');
+            }
         }
 
-        return $this->redirectToRoute('admin_dashboard');
+        return $this->redirectToRoute('admin_flight_index');
     }
 
     // --- Remove User Management --- 

@@ -4,6 +4,8 @@
 
 {% block admin_stylesheets %}
     {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <style>
         /* Professional Currency Modal Styles */
@@ -201,6 +203,8 @@
 
 {% block admin_javascripts %}
     {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Currency Modal logic
         document.addEventListener('DOMContentLoaded', function() {
@@ -298,10 +302,72 @@
             // Initialize tooltips
             $('[data-toggle="tooltip"]').tooltip();
 
-            // Handle new flight button
-            $('#newFlightBtn').click(function() {
-                $.get("{{ path('admin_vol_new_modal') }}", function(data) {
-                    $('#modalContainer').html(data).modal('show');
+            // Handle new flight button click
+            $('#newFlightBtn').on('click', function(e) {
+                e.preventDefault();
+                console.log('New Flight button clicked');
+                
+                $.ajax({
+                    url: "{{ path('admin_vol_new_modal') }}",
+                    method: 'GET',
+                    success: function(response) {
+                        console.log('Modal content loaded:', response);
+                        if (response) {
+                            // Remove any existing modal
+                            if ($('#flightModal').length) {
+                                $('#flightModal').remove();
+                            }
+                            
+                            // Add the new modal to the body
+                            $('body').append(response);
+                            
+                            // Show the modal
+                            var modal = new bootstrap.Modal(document.getElementById('flightModal'));
+                            modal.show();
+                        } else {
+                            console.error('Empty response received');
+                            alert('Error: Empty response received from server');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading modal:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Error loading the form: ' + (xhr.responseText || 'Unknown error'));
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submission
+            $(document).on('submit', '#flightForm', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#flightModal').modal('hide');
+                            window.location.reload();
+                        } else {
+                            alert('Error: ' + (response.errors ? response.errors.join('\n') : 'Unknown error'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error submitting form:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('An error occurred while saving the flight: ' + (xhr.responseText || 'Unknown error'));
+                    }
                 });
             });
         });
@@ -311,40 +377,48 @@
 {% block admin_content %}
     <div class="admin-content-wrapper">
         <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-            <div>
-                <button id="newFlightBtn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Flight
-                </button>
-                <button id="currencyBtn" class="btn btn-secondary ml-2">Currency</button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                <div>
+                    <button id="newFlightBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Flight
+                    </button>
+                    <button id="currencyBtn" class="btn btn-secondary ms-2">Currency</button>
+                </div>
             </div>
+            
+            <!-- Flight Modal -->
+            <div class="modal fade" id="flightModal" tabindex="-1" aria-labelledby="flightModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <!-- Modal content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>{{ stats.totalFlights }}</h3>
+                    <p>Total Flights</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ stats.upcomingFlights }}</h3>
+                    <p>Upcoming Flights</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ stats.todayFlights }}</h3>
+                    <p>Today's Flights</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ stats.totalRevenue }}€</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div id='calendar'></div>
         </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-cards">
-            <div class="stat-card">
-                <h3>{{ stats.totalFlights }}</h3>
-                <p>Total Flights</p>
-            </div>
-            <div class="stat-card">
-                <h3>{{ stats.upcomingFlights }}</h3>
-                <p>Upcoming Flights</p>
-            </div>
-            <div class="stat-card">
-                <h3>{{ stats.todayFlights }}</h3>
-                <p>Today's Flights</p>
-            </div>
-            <div class="stat-card">
-                <h3>{{ stats.totalRevenue }}€</h3>
-                <p>Total Revenue</p>
-            </div>
-        </div>
-
-        <!-- Calendar -->
-        <div id='calendar'></div>
-    </div>
-
 
         <!-- Currency Modal -->
         <div id="currencyModal" class="custom-modal-overlay">
@@ -361,312 +435,312 @@
                     <div class="form-group">
                         <label for="fromCurrency">From Currency</label>
                         <select id="fromCurrency" name="from" class="form-control" required>
-    <option value="USD">USD</option>
-    <option value="EUR">EUR</option>
-    <option value="AED">AED</option>
-    <option value="AFN">AFN</option>
-    <option value="ALL">ALL</option>
-    <option value="AMD">AMD</option>
-    <option value="ANG">ANG</option>
-    <option value="AOA">AOA</option>
-    <option value="ARS">ARS</option>
-    <option value="AUD">AUD</option>
-    <option value="AWG">AWG</option>
-    <option value="AZN">AZN</option>
-    <option value="BAM">BAM</option>
-    <option value="BBD">BBD</option>
-    <option value="BDT">BDT</option>
-    <option value="BGN">BGN</option>
-    <option value="BHD">BHD</option>
-    <option value="BIF">BIF</option>
-    <option value="BMD">BMD</option>
-    <option value="BND">BND</option>
-    <option value="BOB">BOB</option>
-    <option value="BRL">BRL</option>
-    <option value="BSD">BSD</option>
-    <option value="BTN">BTN</option>
-    <option value="BWP">BWP</option>
-    <option value="BZD">BZD</option>
-    <option value="CAD">CAD</option>
-    <option value="CDF">CDF</option>
-    <option value="CHF">CHF</option>
-    <option value="CLF">CLF</option>
-    <option value="CLP">CLP</option>
-    <option value="CNH">CNH</option>
-    <option value="CNY">CNY</option>
-    <option value="COP">COP</option>
-    <option value="CUP">CUP</option>
-    <option value="CVE">CVE</option>
-    <option value="CZK">CZK</option>
-    <option value="DJF">DJF</option>
-    <option value="DKK">DKK</option>
-    <option value="DOP">DOP</option>
-    <option value="DZD">DZD</option>
-    <option value="EGP">EGP</option>
-    <option value="ERN">ERN</option>
-    <option value="ETB">ETB</option>
-    <option value="FJD">FJD</option>
-    <option value="FKP">FKP</option>
-    <option value="GBP">GBP</option>
-    <option value="GEL">GEL</option>
-    <option value="GHS">GHS</option>
-    <option value="GIP">GIP</option>
-    <option value="GMD">GMD</option>
-    <option value="GNF">GNF</option>
-    <option value="GTQ">GTQ</option>
-    <option value="GYD">GYD</option>
-    <option value="HKD">HKD</option>
-    <option value="HNL">HNL</option>
-    <option value="HRK">HRK</option>
-    <option value="HTG">HTG</option>
-    <option value="HUF">HUF</option>
-    <option value="IDR">IDR</option>
-    <option value="ILS">ILS</option>
-    <option value="INR">INR</option>
-    <option value="IQD">IQD</option>
-    <option value="IRR">IRR</option>
-    <option value="ISK">ISK</option>
-    <option value="JMD">JMD</option>
-    <option value="JOD">JOD</option>
-    <option value="JPY">JPY</option>
-    <option value="KES">KES</option>
-    <option value="KGS">KGS</option>
-    <option value="KHR">KHR</option>
-    <option value="KMF">KMF</option>
-    <option value="KPW">KPW</option>
-    <option value="KRW">KRW</option>
-    <option value="KWD">KWD</option>
-    <option value="KYD">KYD</option>
-    <option value="KZT">KZT</option>
-    <option value="LAK">LAK</option>
-    <option value="LBP">LBP</option>
-    <option value="LKR">LKR</option>
-    <option value="LRD">LRD</option>
-    <option value="LSL">LSL</option>
-    <option value="LYD">LYD</option>
-    <option value="MAD">MAD</option>
-    <option value="MDL">MDL</option>
-    <option value="MGA">MGA</option>
-    <option value="MKD">MKD</option>
-    <option value="MMK">MMK</option>
-    <option value="MNT">MNT</option>
-    <option value="MOP">MOP</option>
-    <option value="MRU">MRU</option>
-    <option value="MUR">MUR</option>
-    <option value="MVR">MVR</option>
-    <option value="MWK">MWK</option>
-    <option value="MXN">MXN</option>
-    <option value="MYR">MYR</option>
-    <option value="MZN">MZN</option>
-    <option value="NAD">NAD</option>
-    <option value="NGN">NGN</option>
-    <option value="NOK">NOK</option>
-    <option value="NPR">NPR</option>
-    <option value="NZD">NZD</option>
-    <option value="OMR">OMR</option>
-    <option value="PAB">PAB</option>
-    <option value="PEN">PEN</option>
-    <option value="PGK">PGK</option>
-    <option value="PHP">PHP</option>
-    <option value="PKR">PKR</option>
-    <option value="PLN">PLN</option>
-    <option value="PYG">PYG</option>
-    <option value="QAR">QAR</option>
-    <option value="RON">RON</option>
-    <option value="RSD">RSD</option>
-    <option value="RUB">RUB</option>
-    <option value="RWF">RWF</option>
-    <option value="SAR">SAR</option>
-    <option value="SCR">SCR</option>
-    <option value="SDG">SDG</option>
-    <option value="SEK">SEK</option>
-    <option value="SGD">SGD</option>
-    <option value="SHP">SHP</option>
-    <option value="SLL">SLL</option>
-    <option value="SOS">SOS</option>
-    <option value="SRD">SRD</option>
-    <option value="SYP">SYP</option>
-    <option value="SZL">SZL</option>
-    <option value="THB">THB</option>
-    <option value="TJS">TJS</option>
-    <option value="TMT">TMT</option>
-    <option value="TND">TND</option>
-    <option value="TOP">TOP</option>
-    <option value="TRY">TRY</option>
-    <option value="TTD">TTD</option>
-    <option value="TWD">TWD</option>
-    <option value="TZS">TZS</option>
-    <option value="UAH">UAH</option>
-    <option value="UGX">UGX</option>
-    <option value="UYU">UYU</option>
-    <option value="UZS">UZS</option>
-    <option value="VND">VND</option>
-    <option value="VUV">VUV</option>
-    <option value="WST">WST</option>
-    <option value="XAF">XAF</option>
-    <option value="XCD">XCD</option>
-    <option value="XDR">XDR</option>
-    <option value="XOF">XOF</option>
-    <option value="XPF">XPF</option>
-    <option value="YER">YER</option>
-    <option value="ZAR">ZAR</option>
-    <option value="ZMW">ZMW</option>
-</select>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="AED">AED</option>
+                            <option value="AFN">AFN</option>
+                            <option value="ALL">ALL</option>
+                            <option value="AMD">AMD</option>
+                            <option value="ANG">ANG</option>
+                            <option value="AOA">AOA</option>
+                            <option value="ARS">ARS</option>
+                            <option value="AUD">AUD</option>
+                            <option value="AWG">AWG</option>
+                            <option value="AZN">AZN</option>
+                            <option value="BAM">BAM</option>
+                            <option value="BBD">BBD</option>
+                            <option value="BDT">BDT</option>
+                            <option value="BGN">BGN</option>
+                            <option value="BHD">BHD</option>
+                            <option value="BIF">BIF</option>
+                            <option value="BMD">BMD</option>
+                            <option value="BND">BND</option>
+                            <option value="BOB">BOB</option>
+                            <option value="BRL">BRL</option>
+                            <option value="BSD">BSD</option>
+                            <option value="BTN">BTN</option>
+                            <option value="BWP">BWP</option>
+                            <option value="BZD">BZD</option>
+                            <option value="CAD">CAD</option>
+                            <option value="CDF">CDF</option>
+                            <option value="CHF">CHF</option>
+                            <option value="CLF">CLF</option>
+                            <option value="CLP">CLP</option>
+                            <option value="CNH">CNH</option>
+                            <option value="CNY">CNY</option>
+                            <option value="COP">COP</option>
+                            <option value="CUP">CUP</option>
+                            <option value="CVE">CVE</option>
+                            <option value="CZK">CZK</option>
+                            <option value="DJF">DJF</option>
+                            <option value="DKK">DKK</option>
+                            <option value="DOP">DOP</option>
+                            <option value="DZD">DZD</option>
+                            <option value="EGP">EGP</option>
+                            <option value="ERN">ERN</option>
+                            <option value="ETB">ETB</option>
+                            <option value="FJD">FJD</option>
+                            <option value="FKP">FKP</option>
+                            <option value="GBP">GBP</option>
+                            <option value="GEL">GEL</option>
+                            <option value="GHS">GHS</option>
+                            <option value="GIP">GIP</option>
+                            <option value="GMD">GMD</option>
+                            <option value="GNF">GNF</option>
+                            <option value="GTQ">GTQ</option>
+                            <option value="GYD">GYD</option>
+                            <option value="HKD">HKD</option>
+                            <option value="HNL">HNL</option>
+                            <option value="HRK">HRK</option>
+                            <option value="HTG">HTG</option>
+                            <option value="HUF">HUF</option>
+                            <option value="IDR">IDR</option>
+                            <option value="ILS">ILS</option>
+                            <option value="INR">INR</option>
+                            <option value="IQD">IQD</option>
+                            <option value="IRR">IRR</option>
+                            <option value="ISK">ISK</option>
+                            <option value="JMD">JMD</option>
+                            <option value="JOD">JOD</option>
+                            <option value="JPY">JPY</option>
+                            <option value="KES">KES</option>
+                            <option value="KGS">KGS</option>
+                            <option value="KHR">KHR</option>
+                            <option value="KMF">KMF</option>
+                            <option value="KPW">KPW</option>
+                            <option value="KRW">KRW</option>
+                            <option value="KWD">KWD</option>
+                            <option value="KYD">KYD</option>
+                            <option value="KZT">KZT</option>
+                            <option value="LAK">LAK</option>
+                            <option value="LBP">LBP</option>
+                            <option value="LKR">LKR</option>
+                            <option value="LRD">LRD</option>
+                            <option value="LSL">LSL</option>
+                            <option value="LYD">LYD</option>
+                            <option value="MAD">MAD</option>
+                            <option value="MDL">MDL</option>
+                            <option value="MGA">MGA</option>
+                            <option value="MKD">MKD</option>
+                            <option value="MMK">MMK</option>
+                            <option value="MNT">MNT</option>
+                            <option value="MOP">MOP</option>
+                            <option value="MRU">MRU</option>
+                            <option value="MUR">MUR</option>
+                            <option value="MVR">MVR</option>
+                            <option value="MWK">MWK</option>
+                            <option value="MXN">MXN</option>
+                            <option value="MYR">MYR</option>
+                            <option value="MZN">MZN</option>
+                            <option value="NAD">NAD</option>
+                            <option value="NGN">NGN</option>
+                            <option value="NOK">NOK</option>
+                            <option value="NPR">NPR</option>
+                            <option value="NZD">NZD</option>
+                            <option value="OMR">OMR</option>
+                            <option value="PAB">PAB</option>
+                            <option value="PEN">PEN</option>
+                            <option value="PGK">PGK</option>
+                            <option value="PHP">PHP</option>
+                            <option value="PKR">PKR</option>
+                            <option value="PLN">PLN</option>
+                            <option value="PYG">PYG</option>
+                            <option value="QAR">QAR</option>
+                            <option value="RON">RON</option>
+                            <option value="RSD">RSD</option>
+                            <option value="RUB">RUB</option>
+                            <option value="RWF">RWF</option>
+                            <option value="SAR">SAR</option>
+                            <option value="SCR">SCR</option>
+                            <option value="SDG">SDG</option>
+                            <option value="SEK">SEK</option>
+                            <option value="SGD">SGD</option>
+                            <option value="SHP">SHP</option>
+                            <option value="SLL">SLL</option>
+                            <option value="SOS">SOS</option>
+                            <option value="SRD">SRD</option>
+                            <option value="SYP">SYP</option>
+                            <option value="SZL">SZL</option>
+                            <option value="THB">THB</option>
+                            <option value="TJS">TJS</option>
+                            <option value="TMT">TMT</option>
+                            <option value="TND">TND</option>
+                            <option value="TOP">TOP</option>
+                            <option value="TRY">TRY</option>
+                            <option value="TTD">TTD</option>
+                            <option value="TWD">TWD</option>
+                            <option value="TZS">TZS</option>
+                            <option value="UAH">UAH</option>
+                            <option value="UGX">UGX</option>
+                            <option value="UYU">UYU</option>
+                            <option value="UZS">UZS</option>
+                            <option value="VND">VND</option>
+                            <option value="VUV">VUV</option>
+                            <option value="WST">WST</option>
+                            <option value="XAF">XAF</option>
+                            <option value="XCD">XCD</option>
+                            <option value="XDR">XDR</option>
+                            <option value="XOF">XOF</option>
+                            <option value="XPF">XPF</option>
+                            <option value="YER">YER</option>
+                            <option value="ZAR">ZAR</option>
+                            <option value="ZMW">ZMW</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Convert To</label>
                         <div id="toCurrencyList" class="checkbox-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px;">
-    <label><input type="checkbox" value="USD"> USD</label>
-    <label><input type="checkbox" value="EUR"> EUR</label>
-    <label><input type="checkbox" value="AED"> AED</label>
-    <label><input type="checkbox" value="AFN"> AFN</label>
-    <label><input type="checkbox" value="ALL"> ALL</label>
-    <label><input type="checkbox" value="AMD"> AMD</label>
-    <label><input type="checkbox" value="ANG"> ANG</label>
-    <label><input type="checkbox" value="AOA"> AOA</label>
-    <label><input type="checkbox" value="ARS"> ARS</label>
-    <label><input type="checkbox" value="AUD"> AUD</label>
-    <label><input type="checkbox" value="AWG"> AWG</label>
-    <label><input type="checkbox" value="AZN"> AZN</label>
-    <label><input type="checkbox" value="BAM"> BAM</label>
-    <label><input type="checkbox" value="BBD"> BBD</label>
-    <label><input type="checkbox" value="BDT"> BDT</label>
-    <label><input type="checkbox" value="BGN"> BGN</label>
-    <label><input type="checkbox" value="BHD"> BHD</label>
-    <label><input type="checkbox" value="BIF"> BIF</label>
-    <label><input type="checkbox" value="BMD"> BMD</label>
-    <label><input type="checkbox" value="BND"> BND</label>
-    <label><input type="checkbox" value="BOB"> BOB</label>
-    <label><input type="checkbox" value="BRL"> BRL</label>
-    <label><input type="checkbox" value="BSD"> BSD</label>
-    <label><input type="checkbox" value="BTN"> BTN</label>
-    <label><input type="checkbox" value="BWP"> BWP</label>
-    <label><input type="checkbox" value="BZD"> BZD</label>
-    <label><input type="checkbox" value="CAD"> CAD</label>
-    <label><input type="checkbox" value="CDF"> CDF</label>
-    <label><input type="checkbox" value="CHF"> CHF</label>
-    <label><input type="checkbox" value="CLF"> CLF</label>
-    <label><input type="checkbox" value="CLP"> CLP</label>
-    <label><input type="checkbox" value="CNH"> CNH</label>
-    <label><input type="checkbox" value="CNY"> CNY</label>
-    <label><input type="checkbox" value="COP"> COP</label>
-    <label><input type="checkbox" value="CUP"> CUP</label>
-    <label><input type="checkbox" value="CVE"> CVE</label>
-    <label><input type="checkbox" value="CZK"> CZK</label>
-    <label><input type="checkbox" value="DJF"> DJF</label>
-    <label><input type="checkbox" value="DKK"> DKK</label>
-    <label><input type="checkbox" value="DOP"> DOP</label>
-    <label><input type="checkbox" value="DZD"> DZD</label>
-    <label><input type="checkbox" value="EGP"> EGP</label>
-    <label><input type="checkbox" value="ERN"> ERN</label>
-    <label><input type="checkbox" value="ETB"> ETB</label>
-    <label><input type="checkbox" value="FJD"> FJD</label>
-    <label><input type="checkbox" value="FKP"> FKP</label>
-    <label><input type="checkbox" value="GBP"> GBP</label>
-    <label><input type="checkbox" value="GEL"> GEL</label>
-    <label><input type="checkbox" value="GHS"> GHS</label>
-    <label><input type="checkbox" value="GIP"> GIP</label>
-    <label><input type="checkbox" value="GMD"> GMD</label>
-    <label><input type="checkbox" value="GNF"> GNF</label>
-    <label><input type="checkbox" value="GTQ"> GTQ</label>
-    <label><input type="checkbox" value="GYD"> GYD</label>
-    <label><input type="checkbox" value="HKD"> HKD</label>
-    <label><input type="checkbox" value="HNL"> HNL</label>
-    <label><input type="checkbox" value="HRK"> HRK</label>
-    <label><input type="checkbox" value="HTG"> HTG</label>
-    <label><input type="checkbox" value="HUF"> HUF</label>
-    <label><input type="checkbox" value="IDR"> IDR</label>
-    <label><input type="checkbox" value="ILS"> ILS</label>
-    <label><input type="checkbox" value="INR"> INR</label>
-    <label><input type="checkbox" value="IQD"> IQD</label>
-    <label><input type="checkbox" value="IRR"> IRR</label>
-    <label><input type="checkbox" value="ISK"> ISK</label>
-    <label><input type="checkbox" value="JMD"> JMD</label>
-    <label><input type="checkbox" value="JOD"> JOD</label>
-    <label><input type="checkbox" value="JPY"> JPY</label>
-    <label><input type="checkbox" value="KES"> KES</label>
-    <label><input type="checkbox" value="KGS"> KGS</label>
-    <label><input type="checkbox" value="KHR"> KHR</label>
-    <label><input type="checkbox" value="KMF"> KMF</label>
-    <label><input type="checkbox" value="KPW"> KPW</label>
-    <label><input type="checkbox" value="KRW"> KRW</label>
-    <label><input type="checkbox" value="KWD"> KWD</label>
-    <label><input type="checkbox" value="KYD"> KYD</label>
-    <label><input type="checkbox" value="KZT"> KZT</label>
-    <label><input type="checkbox" value="LAK"> LAK</label>
-    <label><input type="checkbox" value="LBP"> LBP</label>
-    <label><input type="checkbox" value="LKR"> LKR</label>
-    <label><input type="checkbox" value="LRD"> LRD</label>
-    <label><input type="checkbox" value="LSL"> LSL</label>
-    <label><input type="checkbox" value="LYD"> LYD</label>
-    <label><input type="checkbox" value="MAD"> MAD</label>
-    <label><input type="checkbox" value="MDL"> MDL</label>
-    <label><input type="checkbox" value="MGA"> MGA</label>
-    <label><input type="checkbox" value="MKD"> MKD</label>
-    <label><input type="checkbox" value="MMK"> MMK</label>
-    <label><input type="checkbox" value="MNT"> MNT</label>
-    <label><input type="checkbox" value="MOP"> MOP</label>
-    <label><input type="checkbox" value="MRU"> MRU</label>
-    <label><input type="checkbox" value="MUR"> MUR</label>
-    <label><input type="checkbox" value="MVR"> MVR</label>
-    <label><input type="checkbox" value="MWK"> MWK</label>
-    <label><input type="checkbox" value="MXN"> MXN</label>
-    <label><input type="checkbox" value="MYR"> MYR</label>
-    <label><input type="checkbox" value="MZN"> MZN</label>
-    <label><input type="checkbox" value="NAD"> NAD</label>
-    <label><input type="checkbox" value="NGN"> NGN</label>
-    <label><input type="checkbox" value="NOK"> NOK</label>
-    <label><input type="checkbox" value="NPR"> NPR</label>
-    <label><input type="checkbox" value="NZD"> NZD</label>
-    <label><input type="checkbox" value="OMR"> OMR</label>
-    <label><input type="checkbox" value="PAB"> PAB</label>
-    <label><input type="checkbox" value="PEN"> PEN</label>
-    <label><input type="checkbox" value="PGK"> PGK</label>
-    <label><input type="checkbox" value="PHP"> PHP</label>
-    <label><input type="checkbox" value="PKR"> PKR</label>
-    <label><input type="checkbox" value="PLN"> PLN</label>
-    <label><input type="checkbox" value="PYG"> PYG</label>
-    <label><input type="checkbox" value="QAR"> QAR</label>
-    <label><input type="checkbox" value="RON"> RON</label>
-    <label><input type="checkbox" value="RSD"> RSD</label>
-    <label><input type="checkbox" value="RUB"> RUB</label>
-    <label><input type="checkbox" value="RWF"> RWF</label>
-    <label><input type="checkbox" value="SAR"> SAR</label>
-    <label><input type="checkbox" value="SCR"> SCR</label>
-    <label><input type="checkbox" value="SDG"> SDG</label>
-    <label><input type="checkbox" value="SEK"> SEK</label>
-    <label><input type="checkbox" value="SGD"> SGD</label>
-    <label><input type="checkbox" value="SHP"> SHP</label>
-    <label><input type="checkbox" value="SLL"> SLL</label>
-    <label><input type="checkbox" value="SOS"> SOS</label>
-    <label><input type="checkbox" value="SRD"> SRD</label>
-    <label><input type="checkbox" value="SYP"> SYP</label>
-    <label><input type="checkbox" value="SZL"> SZL</label>
-    <label><input type="checkbox" value="THB"> THB</label>
-    <label><input type="checkbox" value="TJS"> TJS</label>
-    <label><input type="checkbox" value="TMT"> TMT</label>
-    <label><input type="checkbox" value="TND"> TND</label>
-    <label><input type="checkbox" value="TOP"> TOP</label>
-    <label><input type="checkbox" value="TRY"> TRY</label>
-    <label><input type="checkbox" value="TTD"> TTD</label>
-    <label><input type="checkbox" value="TWD"> TWD</label>
-    <label><input type="checkbox" value="TZS"> TZS</label>
-    <label><input type="checkbox" value="UAH"> UAH</label>
-    <label><input type="checkbox" value="UGX"> UGX</label>
-    <label><input type="checkbox" value="UYU"> UYU</label>
-    <label><input type="checkbox" value="UZS"> UZS</label>
-    <label><input type="checkbox" value="VND"> VND</label>
-    <label><input type="checkbox" value="VUV"> VUV</label>
-    <label><input type="checkbox" value="WST"> WST</label>
-    <label><input type="checkbox" value="XAF"> XAF</label>
-    <label><input type="checkbox" value="XCD"> XCD</label>
-    <label><input type="checkbox" value="XDR"> XDR</label>
-    <label><input type="checkbox" value="XOF"> XOF</label>
-    <label><input type="checkbox" value="XPF"> XPF</label>
-    <label><input type="checkbox" value="YER"> YER</label>
-    <label><input type="checkbox" value="ZAR"> ZAR</label>
-    <label><input type="checkbox" value="ZMW"> ZMW</label>
-</div>
+                            <label><input type="checkbox" value="USD"> USD</label>
+                            <label><input type="checkbox" value="EUR"> EUR</label>
+                            <label><input type="checkbox" value="AED"> AED</label>
+                            <label><input type="checkbox" value="AFN"> AFN</label>
+                            <label><input type="checkbox" value="ALL"> ALL</label>
+                            <label><input type="checkbox" value="AMD"> AMD</label>
+                            <label><input type="checkbox" value="ANG"> ANG</label>
+                            <label><input type="checkbox" value="AOA"> AOA</label>
+                            <label><input type="checkbox" value="ARS"> ARS</label>
+                            <label><input type="checkbox" value="AUD"> AUD</label>
+                            <label><input type="checkbox" value="AWG"> AWG</label>
+                            <label><input type="checkbox" value="AZN"> AZN</label>
+                            <label><input type="checkbox" value="BAM"> BAM</label>
+                            <label><input type="checkbox" value="BBD"> BBD</label>
+                            <label><input type="checkbox" value="BDT"> BDT</label>
+                            <label><input type="checkbox" value="BGN"> BGN</label>
+                            <label><input type="checkbox" value="BHD"> BHD</label>
+                            <label><input type="checkbox" value="BIF"> BIF</label>
+                            <label><input type="checkbox" value="BMD"> BMD</label>
+                            <label><input type="checkbox" value="BND"> BND</label>
+                            <label><input type="checkbox" value="BOB"> BOB</label>
+                            <label><input type="checkbox" value="BRL"> BRL</label>
+                            <label><input type="checkbox" value="BSD"> BSD</label>
+                            <label><input type="checkbox" value="BTN"> BTN</label>
+                            <label><input type="checkbox" value="BWP"> BWP</label>
+                            <label><input type="checkbox" value="BZD"> BZD</label>
+                            <label><input type="checkbox" value="CAD"> CAD</label>
+                            <label><input type="checkbox" value="CDF"> CDF</label>
+                            <label><input type="checkbox" value="CHF"> CHF</label>
+                            <label><input type="checkbox" value="CLF"> CLF</label>
+                            <label><input type="checkbox" value="CLP"> CLP</label>
+                            <label><input type="checkbox" value="CNH"> CNH</label>
+                            <label><input type="checkbox" value="CNY"> CNY</label>
+                            <label><input type="checkbox" value="COP"> COP</label>
+                            <label><input type="checkbox" value="CUP"> CUP</label>
+                            <label><input type="checkbox" value="CVE"> CVE</label>
+                            <label><input type="checkbox" value="CZK"> CZK</label>
+                            <label><input type="checkbox" value="DJF"> DJF</label>
+                            <label><input type="checkbox" value="DKK"> DKK</label>
+                            <label><input type="checkbox" value="DOP"> DOP</label>
+                            <label><input type="checkbox" value="DZD"> DZD</label>
+                            <label><input type="checkbox" value="EGP"> EGP</label>
+                            <label><input type="checkbox" value="ERN"> ERN</label>
+                            <label><input type="checkbox" value="ETB"> ETB</label>
+                            <label><input type="checkbox" value="FJD"> FJD</label>
+                            <label><input type="checkbox" value="FKP"> FKP</label>
+                            <label><input type="checkbox" value="GBP"> GBP</label>
+                            <label><input type="checkbox" value="GEL"> GEL</label>
+                            <label><input type="checkbox" value="GHS"> GHS</label>
+                            <label><input type="checkbox" value="GIP"> GIP</label>
+                            <label><input type="checkbox" value="GMD"> GMD</label>
+                            <label><input type="checkbox" value="GNF"> GNF</label>
+                            <label><input type="checkbox" value="GTQ"> GTQ</label>
+                            <label><input type="checkbox" value="GYD"> GYD</label>
+                            <label><input type="checkbox" value="HKD"> HKD</label>
+                            <label><input type="checkbox" value="HNL"> HNL</label>
+                            <label><input type="checkbox" value="HRK"> HRK</label>
+                            <label><input type="checkbox" value="HTG"> HTG</label>
+                            <label><input type="checkbox" value="HUF"> HUF</label>
+                            <label><input type="checkbox" value="IDR"> IDR</label>
+                            <label><input type="checkbox" value="ILS"> ILS</label>
+                            <label><input type="checkbox" value="INR"> INR</label>
+                            <label><input type="checkbox" value="IQD"> IQD</label>
+                            <label><input type="checkbox" value="IRR"> IRR</label>
+                            <label><input type="checkbox" value="ISK"> ISK</label>
+                            <label><input type="checkbox" value="JMD"> JMD</label>
+                            <label><input type="checkbox" value="JOD"> JOD</label>
+                            <label><input type="checkbox" value="JPY"> JPY</label>
+                            <label><input type="checkbox" value="KES"> KES</label>
+                            <label><input type="checkbox" value="KGS"> KGS</label>
+                            <label><input type="checkbox" value="KHR"> KHR</label>
+                            <label><input type="checkbox" value="KMF"> KMF</label>
+                            <label><input type="checkbox" value="KPW"> KPW</label>
+                            <label><input type="checkbox" value="KRW"> KRW</label>
+                            <label><input type="checkbox" value="KWD"> KWD</label>
+                            <label><input type="checkbox" value="KYD"> KYD</label>
+                            <label><input type="checkbox" value="KZT"> KZT</label>
+                            <label><input type="checkbox" value="LAK"> LAK</label>
+                            <label><input type="checkbox" value="LBP"> LBP</label>
+                            <label><input type="checkbox" value="LKR"> LKR</label>
+                            <label><input type="checkbox" value="LRD"> LRD</label>
+                            <label><input type="checkbox" value="LSL"> LSL</label>
+                            <label><input type="checkbox" value="LYD"> LYD</label>
+                            <label><input type="checkbox" value="MAD"> MAD</label>
+                            <label><input type="checkbox" value="MDL"> MDL</label>
+                            <label><input type="checkbox" value="MGA"> MGA</label>
+                            <label><input type="checkbox" value="MKD"> MKD</label>
+                            <label><input type="checkbox" value="MMK"> MMK</label>
+                            <label><input type="checkbox" value="MNT"> MNT</label>
+                            <label><input type="checkbox" value="MOP"> MOP</label>
+                            <label><input type="checkbox" value="MRU"> MRU</label>
+                            <label><input type="checkbox" value="MUR"> MUR</label>
+                            <label><input type="checkbox" value="MVR"> MVR</label>
+                            <label><input type="checkbox" value="MWK"> MWK</label>
+                            <label><input type="checkbox" value="MXN"> MXN</label>
+                            <label><input type="checkbox" value="MYR"> MYR</label>
+                            <label><input type="checkbox" value="MZN"> MZN</label>
+                            <label><input type="checkbox" value="NAD"> NAD</label>
+                            <label><input type="checkbox" value="NGN"> NGN</label>
+                            <label><input type="checkbox" value="NOK"> NOK</label>
+                            <label><input type="checkbox" value="NPR"> NPR</label>
+                            <label><input type="checkbox" value="NZD"> NZD</label>
+                            <label><input type="checkbox" value="OMR"> OMR</label>
+                            <label><input type="checkbox" value="PAB"> PAB</label>
+                            <label><input type="checkbox" value="PEN"> PEN</label>
+                            <label><input type="checkbox" value="PGK"> PGK</label>
+                            <label><input type="checkbox" value="PHP"> PHP</label>
+                            <label><input type="checkbox" value="PKR"> PKR</label>
+                            <label><input type="checkbox" value="PLN"> PLN</label>
+                            <label><input type="checkbox" value="PYG"> PYG</label>
+                            <label><input type="checkbox" value="QAR"> QAR</label>
+                            <label><input type="checkbox" value="RON"> RON</label>
+                            <label><input type="checkbox" value="RSD"> RSD</label>
+                            <label><input type="checkbox" value="RUB"> RUB</label>
+                            <label><input type="checkbox" value="RWF"> RWF</label>
+                            <label><input type="checkbox" value="SAR"> SAR</label>
+                            <label><input type="checkbox" value="SCR"> SCR</label>
+                            <label><input type="checkbox" value="SDG"> SDG</label>
+                            <label><input type="checkbox" value="SEK"> SEK</label>
+                            <label><input type="checkbox" value="SGD"> SGD</label>
+                            <label><input type="checkbox" value="SHP"> SHP</label>
+                            <label><input type="checkbox" value="SLL"> SLL</label>
+                            <label><input type="checkbox" value="SOS"> SOS</label>
+                            <label><input type="checkbox" value="SRD"> SRD</label>
+                            <label><input type="checkbox" value="SYP"> SYP</label>
+                            <label><input type="checkbox" value="SZL"> SZL</label>
+                            <label><input type="checkbox" value="THB"> THB</label>
+                            <label><input type="checkbox" value="TJS"> TJS</label>
+                            <label><input type="checkbox" value="TMT"> TMT</label>
+                            <label><input type="checkbox" value="TND"> TND</label>
+                            <label><input type="checkbox" value="TOP"> TOP</label>
+                            <label><input type="checkbox" value="TRY"> TRY</label>
+                            <label><input type="checkbox" value="TTD"> TTD</label>
+                            <label><input type="checkbox" value="TWD"> TWD</label>
+                            <label><input type="checkbox" value="TZS"> TZS</label>
+                            <label><input type="checkbox" value="UAH"> UAH</label>
+                            <label><input type="checkbox" value="UGX"> UGX</label>
+                            <label><input type="checkbox" value="UYU"> UYU</label>
+                            <label><input type="checkbox" value="UZS"> UZS</label>
+                            <label><input type="checkbox" value="VND"> VND</label>
+                            <label><input type="checkbox" value="VUV"> VUV</label>
+                            <label><input type="checkbox" value="WST"> WST</label>
+                            <label><input type="checkbox" value="XAF"> XAF</label>
+                            <label><input type="checkbox" value="XCD"> XCD</label>
+                            <label><input type="checkbox" value="XDR"> XDR</label>
+                            <label><input type="checkbox" value="XOF"> XOF</label>
+                            <label><input type="checkbox" value="XPF"> XPF</label>
+                            <label><input type="checkbox" value="YER"> YER</label>
+                            <label><input type="checkbox" value="ZAR"> ZAR</label>
+                            <label><input type="checkbox" value="ZMW"> ZMW</label>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Convert</button>
                     <div id="conversionResults" class="mt-3"></div>

@@ -1,0 +1,66 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block admin_content %}
+<div class="modal fade" id="flightModal" tabindex="-1" aria-labelledby="flightModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="flightModalLabel">Ajouter un nouveau vol</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form, {'attr': {'id': 'flightForm', 'action': action}}) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.compagnie, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.compagnie, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.compagnie) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.aeroport_depart, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.aeroport_depart, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.aeroport_depart) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.aeroport_arrivee, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.aeroport_arrivee, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.aeroport_arrivee) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.date_depart, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.date_depart, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.date_depart) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.date_arrivee, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.date_arrivee, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.date_arrivee) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label'}}) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                                    <span class="input-group-text">€</span>
+                                </div>
+                                {{ form_help(form.prix) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.destination, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.destination, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_help(form.destination) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

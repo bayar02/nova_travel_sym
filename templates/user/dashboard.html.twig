@@ -351,7 +351,6 @@
                 searchTimeout = setTimeout(() => {
                     const searchData = {
                         destination: $("#destination").val(),
-                        aeroport_arrivee: $("#aeroport_arrivee").val(),
                         dateStart: $("#dateStart").val(),
                         dateEnd: $("#dateEnd").val(),
                         sortBy: $("#sortBy").val()
@@ -360,7 +359,13 @@
                     $.get("{{ path('app_vol_search_ajax') }}", searchData, function(response) {
                         if (response.success) {
                             updateFlightsTable(response.flights);
+                        } else {
+                            console.error('Search failed:', response);
+                            $(".flights-table").html('<div class="alert alert-danger m-3">An error occurred while searching. Please try again.</div>');
                         }
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error('AJAX error:', textStatus, errorThrown);
+                        $(".flights-table").html('<div class="alert alert-danger m-3">An error occurred while searching. Please try again.</div>');
                     });
                 }, 300);
             }
@@ -369,12 +374,13 @@
             function updateFlightsTable(flights) {
                 const tableContainer = $(".flights-table");
                 
-                if (flights.length === 0) {
+                if (!flights || flights.length === 0) {
                     tableContainer.html('<div class="alert alert-info m-3">No flights found. Try different search criteria.</div>');
+                    $(".search-results-title").text('No flights found');
                     return;
                 }
 
-                // Create table structure if it doesn't exist
+                // Create table structure
                 let table = `
                     <table class="table table-hover mb-0">
                         <thead>
@@ -421,7 +427,7 @@
             }
 
             // Attach event listeners for live search
-            $("#destination, #aeroport_arrivee").on('keyup', function() {
+            $("#destination").on('keyup', function() {
                 if ($(this).val().length >= 2) {
                     performSearch();
                 }

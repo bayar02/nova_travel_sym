@@ -1,0 +1,161 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block admin_title %}Gestion des vols{% endblock %}
+
+{% block admin_content %}
+    <div class="admin-content-wrapper">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Gestion des vols</h1>
+                <div>
+                    <button id="newFlightBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouveau vol
+                    </button>
+                </div>
+            </div>
+
+            <!-- Flight Modal -->
+            <div class="modal fade" id="flightModal" tabindex="-1" aria-labelledby="flightModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <!-- Modal content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flight List -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Compagnie</th>
+                                    <th>Départ</th>
+                                    <th>Arrivée</th>
+                                    <th>Date de départ</th>
+                                    <th>Date d'arrivée</th>
+                                    <th>Prix</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vol in vols %}
+                                    <tr>
+                                        <td>{{ vol.compagnie }}</td>
+                                        <td>{{ vol.aeroportDepart }}</td>
+                                        <td>{{ vol.aeroportArrivee }}</td>
+                                        <td>{{ vol.dateDepart|date('d/m/Y H:i') }}</td>
+                                        <td>{{ vol.dateArrivee|date('d/m/Y H:i') }}</td>
+                                        <td>{{ vol.prix }}€</td>
+                                        <td>
+                                            {% if vol.dateDepart > date() %}
+                                                <span class="badge bg-success">À venir</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Passé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{{ path('admin_vol_edit', {'id': vol.id}) }}" 
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('admin_vol_delete', {'id': vol.id}) }}" 
+                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce vol ?');"
+                                                      style="display: inline;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vol.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">Aucun vol trouvé</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block admin_javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle new flight button click
+            $('#newFlightBtn').on('click', function(e) {
+                e.preventDefault();
+                console.log('New Flight button clicked');
+                
+                $.ajax({
+                    url: "{{ path('admin_vol_new_modal') }}",
+                    method: 'GET',
+                    success: function(response) {
+                        console.log('Modal content loaded:', response);
+                        if (response) {
+                            // Remove any existing modal
+                            if ($('#flightModal').length) {
+                                $('#flightModal').remove();
+                            }
+                            
+                            // Add the new modal to the body
+                            $('body').append(response);
+                            
+                            // Show the modal
+                            var modal = new bootstrap.Modal(document.getElementById('flightModal'));
+                            modal.show();
+                        } else {
+                            console.error('Empty response received');
+                            alert('Error: Empty response received from server');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading modal:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Error loading the form: ' + (xhr.responseText || 'Unknown error'));
+                    }
+                });
+            });
+
+            // Handle form submission
+            $(document).on('submit', '#flightForm', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#flightModal').modal('hide');
+                            window.location.reload();
+                        } else {
+                            alert('Error: ' + (response.errors ? response.errors.join('\n') : 'Unknown error'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error submitting form:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('An error occurred while saving the flight: ' + (xhr.responseText || 'Unknown error'));
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
