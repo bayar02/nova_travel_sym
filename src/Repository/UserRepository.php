@@ -165,27 +165,6 @@ class UserRepository extends ServiceEntityRepository
     //    }
 
     /**
-     * Search users by various fields
-     * @param string|null $searchTerm Search term to look for in nom, prenom, mail, and cin
-     * @return User[]
-     */
-    public function searchUsers(?string $searchTerm): array
-    {
-        if (!$searchTerm) {
-            return $this->findAll();
-        }
-
-        return $this->createQueryBuilder('u')
-            ->where('u.nom LIKE :searchTerm')
-            ->orWhere('u.prenom LIKE :searchTerm')
-            ->orWhere('u.mail LIKE :searchTerm')
-            ->orWhere('u.cin LIKE :searchTerm')
-            ->setParameter('searchTerm', '%' . $searchTerm . '%')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * Sort users by a specific field
      * @param string $field Field to sort by (id, nom, prenom, mail, cin)
      * @param string $direction Sort direction (ASC or DESC)
